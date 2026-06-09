@@ -6,7 +6,10 @@
 <title>UT 프로토타입</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { margin: 0; padding: 0; }
+  html, body { margin: 0; padding: 0; overflow-x: hidden; }
+  @media (max-width: 599px) {
+    html, body { height: 100dvh; overflow: hidden; }
+  }
   * { -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
   /* 버튼 탭 피드백 */
   *[style*="cursor:pointer"]:active { filter: brightness(0.88); transition: filter 0.08s ease; }
@@ -57,14 +60,25 @@
   /* 공통 스크롤 자연스러움 */
   .screen2-scroll,
   #s2-scroll,
+  #s3-scroll,
   #s4-scroll,
   #s4-sheet-scroll,
-  #s5-scroll,
-  [data-screen-id="s3"] .screen-root {
+  #s5-scroll {
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
     scroll-behavior: auto;
   }
+
+  /* 프로토타입 Status Bar: 시스템 영역 중복 방지 */
+  .ut-statusbar { overflow: hidden; flex-shrink: 0; }
+  .ut-statusbar > * { display: none !important; }
+
+  /* 프로토타입 Home Indicator 제거 */
+  .ut-home-indicator { display: none !important; }
+
+  /* s3-scroll 스크롤바 숨김 */
+  #s3-scroll { overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+  #s3-scroll::-webkit-scrollbar { display: none; }
 
   /* Screen 2 content scroll wrapper */
   .screen2-scroll {
@@ -158,7 +172,7 @@
       <div class="screen-root" style="background:#d2d4d9;">
 
         <!-- Status Bar -->
-        <div style="position:absolute;left:0;top:0;width:375px;height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;">
+        <div class="ut-statusbar" style="position:absolute;left:0;top:0;width:100%;height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;">
           <div style="display:flex;flex-direction:column;align-items:flex-start;flex-shrink:0;">
             <p style="font-family:'Pretendard',sans-serif;font-weight:700;font-size:15px;color:#1c1c1e;line-height:normal;white-space:nowrap;">9:41</p>
           </div>
@@ -293,17 +307,17 @@
         </div>
 
         <!-- Bottom gradient -->
-        <div style="position:absolute;bottom:0;left:0;width:375px;height:140px;background:linear-gradient(to bottom, rgba(193,193,193,0) 0%, #c1c1c1 50.048%);pointer-events:none;"></div>
+        <div style="position:absolute;bottom:0;left:0;width:100%;height:140px;background:linear-gradient(to bottom, rgba(193,193,193,0) 0%, #c1c1c1 50.048%);pointer-events:none;"></div>
 
-        <!-- Home bar -->
-        <div style="position:absolute;bottom:0;left:0;width:375px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:21px 120.5px 8px;overflow:clip;">
+        <!-- Home bar (removed) -->
+        <div class="ut-home-indicator" style="position:absolute;bottom:0;left:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:21px 120.5px 8px;overflow:clip;">
           <div style="height:5px;width:134px;flex-shrink:0;position:relative;">
             <div style="position:absolute;background:#101010;inset:0;border-radius:100px;"></div>
           </div>
         </div>
 
         <!-- GNB -->
-        <div style="position:absolute;bottom:34px;left:50%;transform:translateX(-50%);height:52px;width:375px;">
+        <div style="position:absolute;bottom:max(8px,env(safe-area-inset-bottom,8px));left:50%;transform:translateX(-50%);height:52px;width:375px;">
           <!-- Active tab bg (right) -->
           <div style="position:absolute;left:312px;top:0;width:52px;height:52px;background:rgba(255,255,255,0.5);border-radius:999px;box-shadow:0px 0px 20px 0px rgba(0,0,0,0.05);"></div>
           <!-- Active tab icon -->
@@ -435,9 +449,9 @@
         </div><!-- /s2-scroll -->
 
         <!-- ② 고정 헤더 (Status Bar + Header) — position:absolute within screen-root -->
-        <div style="position:absolute;top:0;left:0;width:375px;z-index:10;background:#d2d4d9;">
+        <div style="position:absolute;top:0;left:0;width:100%;z-index:10;background:#d2d4d9;">
           <!-- Status Bar -->
-          <div style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;">
+          <div class="ut-statusbar" style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;">
             <p style="font-family:'Pretendard',sans-serif;font-weight:700;font-size:15px;color:#1c1c1e;line-height:normal;white-space:nowrap;">9:41</p>
             <div style="display:flex;gap:5px;align-items:center;">
               <div style="display:flex;align-items:center;justify-content:center;"><div style="transform:scaleY(-1);"><div style="width:18px;height:22px;position:relative;"><img alt="" style="position:absolute;inset:0;max-width:none;width:100%;height:100%;display:block;" src="https://www.figma.com/api/mcp/asset/609112b0-55c7-44f0-b1f0-6a3b9e517359"></div></div></div>
@@ -479,15 +493,15 @@
         </div>
 
         <!-- ③ 하단 그라디언트 오버레이 -->
-        <div style="position:absolute;bottom:0;left:0;width:375px;height:140px;background:linear-gradient(to bottom,rgba(193,193,193,0) 0%,#c1c1c1 50%);pointer-events:none;z-index:5;"></div>
+        <div style="position:absolute;bottom:0;left:0;width:100%;height:140px;background:linear-gradient(to bottom,rgba(193,193,193,0) 0%,#c1c1c1 50%);pointer-events:none;z-index:5;"></div>
 
-        <!-- ④ Home bar -->
-        <div style="position:absolute;bottom:0;left:0;width:375px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:21px 120.5px 8px;z-index:7;">
+        <!-- ④ Home bar (removed) -->
+        <div class="ut-home-indicator" style="position:absolute;bottom:0;left:0;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:21px 120.5px 8px;z-index:7;">
           <div style="height:5px;width:134px;position:relative;"><div style="position:absolute;background:#101010;inset:0;border-radius:100px;"></div></div>
         </div>
 
         <!-- ⑤ GNB -->
-        <div style="position:absolute;bottom:34px;left:50%;transform:translateX(-50%);height:52px;width:375px;z-index:6;">
+        <div style="position:absolute;bottom:max(8px,env(safe-area-inset-bottom,8px));left:50%;transform:translateX(-50%);height:52px;width:375px;z-index:6;">
           <div style="position:absolute;left:312px;top:0;width:52px;height:52px;background:rgba(255,255,255,0.5);border-radius:999px;box-shadow:0px 0px 20px 0px rgba(0,0,0,0.05);"></div>
           <div style="position:absolute;left:312px;top:0;width:52px;height:52px;overflow:clip;border-radius:999px;"><div style="position:absolute;left:14px;top:14px;display:flex;flex-direction:column;align-items:center;overflow:clip;"><div style="margin-bottom:-16px;flex-shrink:0;width:24px;height:24px;position:relative;"><img alt="" style="position:absolute;inset:0;max-width:none;width:100%;height:100%;display:block;" src="https://www.figma.com/api/mcp/asset/731fdb28-5011-41b1-a538-fb03cf76da3f"></div><p style="font-family:'Pretendard Variable',sans-serif;font-weight:500;font-size:12px;color:#121212;text-align:center;letter-spacing:-0.12px;opacity:0;flex-shrink:0;min-width:100%;position:relative;">혜택</p></div></div>
           <div style="position:absolute;left:11px;top:0;width:293px;height:52px;background:rgba(255,255,255,0.5);border-radius:26px;box-shadow:0px 0px 20px 0px rgba(0,0,0,0.05);"></div>
@@ -506,10 +520,13 @@
 
     <!-- ===== SCREEN 3: 내 그룹 관리 ===== -->
     <div class="ut-screen" data-screen-id="s3">
-      <div class="screen-root" style="background:#f7f8fa;overflow-y:auto;">
+      <div class="screen-root" style="background:#f7f8fa;overflow:hidden;">
+
+        <!-- Scroll container -->
+        <div id="s3-scroll" style="position:absolute;top:120px;left:0;right:0;bottom:0;">
 
         <!-- Content (scrollable) -->
-        <div style="position:absolute;left:0;top:120px;width:375px;display:flex;flex-direction:column;">
+        <div style="display:flex;flex-direction:column;">
 
           <!-- 내 가족 section -->
           <div style="display:flex;flex-direction:column;align-items:flex-start;padding:20px 16px;flex-shrink:0;width:100%;">
@@ -669,12 +686,13 @@
               </div>
             </div>
           </div>
-        </div><!-- /scrollable content -->
+        </div><!-- /content -->
+        </div><!-- /s3-scroll -->
 
         <!-- Fixed header: Status Bar + Search Header -->
-        <div style="position:absolute;left:0;top:0;width:375px;display:flex;flex-direction:column;align-items:flex-start;background:#f7f8fa;z-index:10;">
+        <div style="position:absolute;left:0;top:0;width:100%;display:flex;flex-direction:column;align-items:flex-start;background:#f7f8fa;z-index:10;">
           <!-- Status Bar -->
-          <div style="display:flex;height:54px;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;flex-shrink:0;width:100%;">
+          <div class="ut-statusbar" style="display:flex;height:54px;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;flex-shrink:0;width:100%;">
             <div style="display:flex;flex-direction:column;align-items:flex-start;flex-shrink:0;">
               <p style="font-family:'Pretendard',sans-serif;font-weight:700;font-size:15px;color:#1c1c1e;line-height:normal;white-space:nowrap;">9:41</p>
             </div>
@@ -934,9 +952,9 @@
         </div><!-- /s4-scroll -->
 
         <!-- ② 고정 헤더 (Status Bar + Header) -->
-        <div style="position:absolute;top:0;left:0;width:375px;z-index:10;background:#f7f8fa;">
+        <div style="position:absolute;top:0;left:0;width:100%;z-index:10;background:#f7f8fa;">
           <!-- Status bar -->
-          <div style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;">
+          <div class="ut-statusbar" style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;">
             <p style="font-family:'Pretendard',sans-serif;font-weight:700;font-size:15px;color:#1c1c1e;line-height:normal;white-space:nowrap;">9:41</p>
             <div style="display:flex;gap:5px;align-items:center;">
               <div style="display:flex;align-items:center;justify-content:center;"><div style="transform:scaleY(-1);"><div style="width:18px;height:22px;position:relative;"><img alt="" style="position:absolute;inset:0;max-width:none;width:100%;height:100%;display:block;" src="https://www.figma.com/api/mcp/asset/3696a3e3-7d37-4837-8f95-344d8231c569"></div></div></div>
@@ -958,7 +976,7 @@
         </div>
 
         <!-- ③ slideinbtn — 김현숙 카드 진입 시 하단에서 slide in -->
-        <div id="s4-slideinbtn" class="s4-slideinbtn" style="position:absolute;bottom:0;left:0;width:375px;z-index:20;transform:translateY(24px);opacity:0;transition:transform 0.42s cubic-bezier(0.34,1.56,0.64,1),opacity 0.28s ease;pointer-events:none;">
+        <div id="s4-slideinbtn" class="s4-slideinbtn" style="position:absolute;bottom:0;left:0;width:100%;z-index:20;transform:translateY(24px);opacity:0;transition:transform 0.42s cubic-bezier(0.34,1.56,0.64,1),opacity 0.28s ease;pointer-events:none;">
           <div style="background:rgba(255,255,255,0.8);border-radius:28px 28px 0 0;box-shadow:0 -5px 60px 0 rgba(35,55,155,0.05);padding:16px 20px 32px;display:flex;flex-direction:column;">
             <div style="display:flex;gap:4px;align-items:center;padding:0 4px 16px;">
               <div style="width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
@@ -1084,7 +1102,7 @@
             </div>
 
             <!-- 하단 BottomGroup CTA -->
-            <div style="position:absolute;bottom:0;left:0;width:375px;">
+            <div style="position:absolute;bottom:0;left:0;width:100%;">
               <div style="background:rgba(255,255,255,0.8);border-radius:28px 28px 0 0;box-shadow:0 -5px 60px 0 rgba(35,55,155,0.05);padding:16px 20px 32px;display:flex;flex-direction:column;">
                 <div style="display:flex;align-items:center;gap:10px;">
                   <div style="position:relative;border-radius:999px;flex-shrink:0;width:52px;height:52px;">
@@ -1447,9 +1465,9 @@
         </div><!-- /s5-scroll -->
 
         <!-- ② 고정 헤더 — 상단에서 slide in -->
-        <div class="s5-fixed-top" style="position:absolute;top:0;left:0;width:375px;z-index:10;background:white;">
+        <div class="s5-fixed-top" style="position:absolute;top:0;left:0;width:100%;z-index:10;background:white;">
           <!-- Status bar -->
-          <div style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;">
+          <div class="ut-statusbar" style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0 24px;">
             <p style="font-family:'Pretendard',sans-serif;font-weight:700;font-size:15px;color:#1c1c1e;line-height:normal;white-space:nowrap;">9:41</p>
             <div style="display:flex;gap:5px;align-items:center;">
               <div style="display:flex;align-items:center;justify-content:center;"><div style="transform:scaleY(-1);"><div style="width:18px;height:22px;position:relative;"><img alt="" style="position:absolute;inset:0;max-width:none;width:100%;height:100%;display:block;" src="https://www.figma.com/api/mcp/asset/c7221307-6cf7-4fb0-802d-5d64c3a3072d"></div></div></div>
@@ -1471,7 +1489,7 @@
         </div>
 
         <!-- ③ 고정 하단 CTA — 하단에서 slide in -->
-        <div class="s5-fixed-bottom" style="position:absolute;bottom:0;left:0;width:375px;z-index:10;">
+        <div class="s5-fixed-bottom" style="position:absolute;bottom:0;left:0;width:100%;z-index:10;">
           <div style="background:rgba(255,255,255,0.8);border-radius:28px 28px 0 0;box-shadow:0 -5px 60px 0 rgba(35,55,155,0.05);padding:16px 20px 32px;display:flex;flex-direction:column;">
             <div style="display:flex;gap:4px;align-items:center;padding:0 4px 16px;">
               <div style="width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
@@ -1510,9 +1528,9 @@
         </div>
 
         <!-- 상단: Status Bar + Nav -->
-        <div style="position:absolute;top:0;left:0;width:375px;z-index:10;">
+        <div style="position:absolute;top:0;left:0;width:100%;z-index:10;">
           <!-- Status Bar: h=54px, pt=14px, px=24px -->
-          <div style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0;">
+          <div class="ut-statusbar" style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:14px 24px 0;">
             <span style="font-family:'Pretendard Variable',sans-serif;font-weight:700;font-size:15px;color:#1c1c1e;white-space:nowrap;">9:41</span>
             <div style="display:flex;gap:5px;align-items:center;">
               <div style="transform:scaleY(-1);flex:none;width:18px;height:22px;position:relative;">
@@ -1573,7 +1591,7 @@
         </div>
 
         <!-- BottomGroup: S6 진입 후 slide-in -->
-        <div class="s6-bottom-group" style="position:absolute;bottom:0;left:0;width:375px;">
+        <div class="s6-bottom-group" style="position:absolute;bottom:0;left:0;width:100%;">
           <div style="background:rgba(255,255,255,0.8);border-radius:28px 28px 0 0;box-shadow:0 -5px 60px 0 rgba(35,55,155,0.05);padding:16px 20px 32px;display:flex;flex-direction:column;">
             <div style="display:flex;gap:4px;align-items:center;padding:0 4px 16px;">
               <div style="width:16px;height:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
