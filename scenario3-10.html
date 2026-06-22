@@ -166,6 +166,41 @@
       cursor: pointer;
     }
 
+    /* ── 장바구니 힌트 말풍선 ── */
+    #cart-hint {
+      position: absolute;
+      bottom: 112px; left: 20px;
+      background: #1c1c1e;
+      color: white;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: -0.4px;
+      line-height: 1.4;
+      white-space: nowrap;
+      z-index: 60;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      pointer-events: none;
+    }
+    #cart-hint::after {
+      content: '';
+      position: absolute;
+      bottom: -7px; left: 28px;
+      width: 0; height: 0;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-top: 7px solid #1c1c1e;
+    }
+    #cart-hint.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    @media (max-width: 767px) { #cart-hint { position: fixed; } }
+
     /* ── 장바구니 담기 토스트 ── */
     #cart-toast {
       position: absolute;
@@ -366,9 +401,12 @@
     <!-- 장바구니 담기 / 결제하기 -->
     <div style="display: flex; gap: 8px; padding: 0 20px;">
       <button class="cta-btn" onclick="goCart()" style="border: 1px solid #111; background: white; color: #222; cursor: pointer;">장바구니 담기</button>
-      <button class="cta-btn" style="border: none; background: #1c1c1e; color: white; cursor: pointer;">결제하기</button>
+      <button class="cta-btn" onclick="showCartHint()" style="border: none; background: #1c1c1e; color: white; cursor: pointer;">결제하기</button>
     </div>
   </div>
+
+  <!-- ── 장바구니 힌트 말풍선 ── -->
+  <div id="cart-hint">장바구니 담기를 눌러주세요</div>
 
   <!-- ── 장바구니 담기 토스트 ── -->
   <div id="cart-toast">
@@ -386,18 +424,31 @@
   function goBack() {
     window.location.href = './scenario3-9.html';
   }
+  var _cartHintTimer = null;
+  function showCartHint() {
+    var hint = document.getElementById('cart-hint');
+    if (!hint) return;
+    hint.classList.add('visible');
+    if (_cartHintTimer) clearTimeout(_cartHintTimer);
+    _cartHintTimer = setTimeout(function() { hint.classList.remove('visible'); }, 2500);
+  }
+
   function goCart() {
     var toast = document.getElementById('cart-toast');
     if (!toast) { window.location.href = './scenario3-11.html'; return; }
     toast.classList.add('visible');
   }
 
-  // 데스크탑에서 bottom-bar를 #app 기준으로 이동
+  // 데스크탑에서 bottom-bar / hint / toast를 #app 기준으로 이동
   (function() {
     var app = document.getElementById('app');
     if (app && window.innerWidth >= 768) {
       var bar = document.querySelector('.bottom-bar');
       if (bar) app.appendChild(bar);
+      var hint = document.getElementById('cart-hint');
+      if (hint) app.appendChild(hint);
+      var toast = document.getElementById('cart-toast');
+      if (toast) app.appendChild(toast);
     }
   })();
 </script>
