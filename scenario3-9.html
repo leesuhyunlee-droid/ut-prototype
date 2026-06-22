@@ -264,10 +264,17 @@
         </svg>
       </div>
     </div>
-    <!-- 선택 완료 (전체 너비) -->
-    <div style="padding: 0 20px;">
+    <!-- 이전 / 선택 완료 버튼 -->
+    <div style="display: flex; gap: 8px; padding: 0 20px;">
+      <button onclick="goPrev()"
+              style="flex: 1; border-radius: 20px; padding: 16px 0;
+                     border: 1px solid #111; background: white; color: #101010; cursor: pointer;
+                     font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+                     font-size: 16px; font-weight: 600; letter-spacing: -0.64px; line-height: 1.3;">
+        이전
+      </button>
       <button id="complete-btn" onclick="goComplete()"
-              style="width: 100%; border-radius: 20px; padding: 16px 32px;
+              style="flex: 1; border-radius: 20px; padding: 16px 0;
                      border: none; background: rgba(91,91,91,0.2); color: white; cursor: default;
                      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
                      font-size: 16px; font-weight: 600; letter-spacing: -0.64px; line-height: 1.3;
@@ -295,6 +302,7 @@
 
 <script>
   function goBack() { showAlert(); }
+  function goPrev() { window.location.href = './scenario3-8.html'; }
   function showAlert() { document.getElementById('alert-overlay').classList.add('visible'); }
   function closeAlert() { document.getElementById('alert-overlay').classList.remove('visible'); }
   function confirmStop() { window.location.href = './scenario3-2.html'; }
