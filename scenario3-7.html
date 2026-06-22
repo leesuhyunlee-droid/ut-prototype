@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>할부 기간 선택 — SKT ConShopping</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif; }
+
+    /* ── 데스크탑: 폰 프레임 ── */
+    @media (min-width: 768px) {
+      body {
+        background: #a8aab4;
+        display: flex; align-items: center; justify-content: center;
+        min-height: 100dvh;
+      }
+      #app {
+        position: relative;
+        width: 375px; height: 812px;
+        overflow: hidden;
+        border-radius: 32px;
+        box-shadow: 0 40px 100px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06);
+        flex-shrink: 0;
+      }
+      .app-scroll {
+        position: absolute; inset: 0;
+        overflow-y: auto; overflow-x: hidden;
+        scrollbar-width: none;
+      }
+      .app-scroll::-webkit-scrollbar { display: none; }
+      .bottom-bar { position: absolute; }
+    }
+    /* ── 모바일 ── */
+    @media (max-width: 767px) {
+      body { background: #f7f8fa; }
+      #app { position: relative; width: 100%; min-height: 100dvh; }
+      .app-scroll { width: 100%; overflow-x: hidden; position: relative; }
+      .bottom-bar { position: fixed; }
+    }
+
+    /* ── 페이지 전환 ── */
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+    .app-scroll { animation: slideInRight 0.28s cubic-bezier(0.4,0,0.2,1) forwards; padding-top: 103px; }
+
+    /* ── 고정 헤더 ── */
+    #page-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 30;
+      background: #f7f8fa;
+    }
+    @media (max-width: 767px) {
+      #page-header { position: fixed; }
+    }
+
+    /* ── 그리드 옵션 카드 ── */
+    .installment-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 0 20px;
+    }
+    .option-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      transition: border-color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .option-card.selected {
+      border-color: #111;
+    }
+    .option-card p {
+      font-size: 14px;
+      font-weight: 500;
+      color: #101010;
+      letter-spacing: -0.56px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    /* ── 하단 버튼 영역 ── */
+    .bottom-bar {
+      bottom: 0; left: 0; right: 0;
+      z-index: 40;
+      padding-top: 16px;
+      padding-bottom: 32px;
+      background: linear-gradient(to top, #f7f8fa 65%, rgba(247,248,250,0));
+    }
+    .cta-btn {
+      flex: 1;
+      border-radius: 20px;
+      padding: 16px 0;
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.64px;
+      line-height: 1.3;
+      text-align: center;
+    }
+
+    /* ── 가입 중단 얼럿 ── */
+    @keyframes alertIn {
+      from { opacity: 0; transform: scale(0.94); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    #alert-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+    }
+    @media (min-width: 768px) {
+      #alert-overlay { position: absolute; }
+    }
+    #alert-overlay.visible { display: flex; }
+    #alert-box {
+      background: white;
+      border-radius: 20px;
+      padding: 28px 20px 20px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: alertIn 0.2s cubic-bezier(0.34,1.2,0.64,1) forwards;
+    }
+    .alert-btn {
+      flex: 1;
+      border-radius: 14px;
+      padding: 14px 0;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: -0.6px;
+      line-height: 1.3;
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+    }
+  </style>
+</head>
+<body>
+<div id="app" style="background: #f7f8fa;">
+
+  <!-- ── 고정 헤더 ── -->
+  <div id="page-header">
+    <div style="display: flex; align-items: center; padding: 11px 19px;">
+      <button onclick="goBack()" style="width: 46px; height: 46px; background: rgba(255,255,255,0.4);
+              border-radius: 999px; box-shadow: 0 0 19px rgba(0,0,0,0.05);
+              border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M14 18L7 11L14 4" stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+    <div style="padding: 0 20px 8px;">
+      <div style="position: relative; width: 328px; height: 6px; background: #f2f2f2; border-radius: 3px;">
+        <div style="position: absolute; left: 0; top: 0; width: 205px; height: 6px; background: #1c1c1e; border-radius: 3px;"></div>
+      </div>
+      <p style="font-size: 12px; font-weight: 400; color: #1c1c1e; letter-spacing: -0.5px; line-height: 1.4; margin-top: 4px;">5/7</p>
+    </div>
+  </div>
+
+  <div class="app-scroll">
+
+    <!-- ── 본문 ── -->
+    <div style="display: flex; flex-direction: column; gap: 20px; padding-top: 16px;">
+
+      <!-- 제목 -->
+      <div style="padding: 0 20px;">
+        <p style="font-size: 18px; font-weight: 500; letter-spacing: -1.26px; line-height: 1.4;
+                  background: linear-gradient(to right, #2f2f2f 40%, #959595 100%);
+                  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+          휴대폰 가격을 몇 개월 동안 나눠 낼까요?
+        </p>
+      </div>
+
+      <!-- 3열 그리드 -->
+      <div class="installment-grid">
+        <div class="option-card" onclick="selectOption(this)"><p>일시불</p></div>
+        <div class="option-card" onclick="selectOption(this)"><p>6개월</p></div>
+        <div class="option-card" onclick="selectOption(this)"><p>12개월</p></div>
+        <div class="option-card" onclick="selectOption(this)"><p>18개월</p></div>
+        <div class="option-card" onclick="selectOption(this)"><p>24개월</p></div>
+        <div class="option-card" onclick="selectOption(this)"><p>30개월</p></div>
+        <div class="option-card" onclick="selectOption(this)"><p>36개월</p></div>
+        <div class="option-card" onclick="selectOption(this)"><p>48개월</p></div>
+      </div>
+
+    </div>
+
+    <!-- 스크롤 여백 -->
+    <div style="height: 160px;"></div>
+
+  </div><!-- /.app-scroll -->
+
+  <!-- ── 하단 버튼 영역 ── -->
+  <div class="bottom-bar">
+    <!-- 예상 월 납부 금액 -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 24px 14px;">
+      <p style="font-size: 14px; font-weight: 500; color: #101010; letter-spacing: -0.56px; line-height: 1.5;">예상 월 납부 금액</p>
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <p style="font-size: 15px; font-weight: 600; color: #000; letter-spacing: -1px; line-height: 26px;">월 118,700원</p>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M4.5 6.5L8 10L11.5 6.5" stroke="#1c1c1e" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <!-- 이전 / 다음 버튼 -->
+    <div style="display: flex; gap: 8px; padding: 0 20px;">
+      <button onclick="goPrev()" class="cta-btn"
+              style="border: 1px solid #111; background: white; color: #101010; cursor: pointer;">이전</button>
+      <button id="next-btn" onclick="goNext()" class="cta-btn"
+              style="border: none; background: rgba(91,91,91,0.2); color: white; cursor: default; transition: background 0.3s ease;">다음</button>
+    </div>
+  </div>
+
+  <!-- ── 가입 중단 얼럿 ── -->
+  <div id="alert-overlay">
+    <div id="alert-box">
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <p style="font-size: 17px; font-weight: 600; color: #101010; letter-spacing: -0.68px; line-height: 1.3;">가입을 중단하시겠어요?</p>
+        <p style="font-size: 14px; font-weight: 400; color: #101010; opacity: 0.45; letter-spacing: -0.56px; line-height: 1.4;">지금까지 선택한 가입 정보가 모두 사라져요.</p>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="alert-btn" onclick="confirmStop()" style="border: 1px solid #ddd; background: white; color: #101010;">중단하기</button>
+        <button class="alert-btn" onclick="closeAlert()" style="border: none; background: #1c1c1e; color: white;">계속 진행하기</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<script>
+  function goBack() { showAlert(); }
+  function goPrev() { window.location.href = './scenario3-6.html'; }
+  function showAlert() { document.getElementById('alert-overlay').classList.add('visible'); }
+  function closeAlert() { document.getElementById('alert-overlay').classList.remove('visible'); }
+  function confirmStop() { window.location.href = './scenario3-2.html'; }
+
+  var selectedCard = null;
+
+  function selectOption(card) {
+    document.querySelectorAll('.option-card').forEach(function(c) {
+      c.classList.remove('selected');
+    });
+    card.classList.add('selected');
+    selectedCard = card;
+
+    var btn = document.getElementById('next-btn');
+    btn.style.background = '#1c1c1e';
+    btn.style.cursor = 'pointer';
+  }
+
+  function goNext() {
+    if (!selectedCard) return;
+    window.location.href = './scenario3-8.html';
+  }
+
+  // 데스크탑에서 bottom-bar / alert-overlay를 #app 기준으로 이동
+  (function() {
+    var app = document.getElementById('app');
+    if (app && window.innerWidth >= 768) {
+      var bar = document.querySelector('.bottom-bar');
+      if (bar) app.appendChild(bar);
+      var overlay = document.getElementById('alert-overlay');
+      if (overlay) app.appendChild(overlay);
+    }
+  })();
+</script>
+</body>
+</html>

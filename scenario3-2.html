@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>iPhone 20 Air — SKT ConShopping</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif; }
+
+    /* ── 데스크탑: 폰 프레임 ── */
+    @media (min-width: 768px) {
+      body {
+        background: #a8aab4;
+        display: flex; align-items: center; justify-content: center;
+        min-height: 100dvh;
+      }
+      #app {
+        position: relative;
+        width: 375px; height: 812px;
+        overflow: hidden;
+        border-radius: 32px;
+        box-shadow: 0 40px 100px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06);
+        flex-shrink: 0;
+      }
+      .app-scroll {
+        position: absolute; inset: 0;
+        overflow-y: auto; overflow-x: hidden;
+        scrollbar-width: none;
+      }
+      .app-scroll::-webkit-scrollbar { display: none; }
+    }
+    /* ── 모바일: 꽉 차게 ── */
+    @media (max-width: 767px) {
+      html { height: auto; overflow-x: hidden; }
+      body { height: auto; background: #fff; overflow-x: hidden; }
+      #app { position: relative; width: 100%; min-height: 100dvh; overflow-x: hidden; }
+      .app-scroll { width: 100%; overflow-x: hidden; position: relative; }
+    }
+
+    /* ── 페이지 전환 애니메이션 ── */
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+    .app-scroll { animation: slideInRight 0.28s cubic-bezier(0.4,0,0.2,1) forwards; }
+
+    /* ── CTA 바 ── */
+    .cta-bar {
+      position: absolute;
+      bottom: 33px; left: 0;
+      width: 100%; z-index: 40;
+      padding: 0 19.084px;
+      pointer-events: none;
+    }
+    .cta-bar .cta-pill {
+      pointer-events: all;
+      transition: background 0.35s ease;
+    }
+
+    @media (max-width: 767px) {
+      .cta-bar { position: fixed; }
+    }
+  </style>
+</head>
+<body>
+<div id="app" class="bg-white">
+  <div class="app-scroll bg-white">
+
+    <!-- ── 썸네일 영역 458px ── -->
+    <div style="position: relative; width: 100%; height: 458px; background: rgba(35,55,155,0.05); flex-shrink: 0;">
+      <img src="./assets_icon/ImageProduct.png" alt="iPhone 20 Air"
+           style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; max-width: none;">
+      <!-- 페이지 인디케이터 -->
+      <div style="position: absolute; bottom: 22.89px; left: 50%; transform: translateX(-50%);
+                  display: flex; gap: 7.634px; align-items: center;">
+        <div style="width: 3.817px; height: 3.817px; border-radius: 50%; background: rgba(0,0,0,0.5);"></div>
+        <div style="width: 3.817px; height: 3.817px; border-radius: 50%; background: rgba(0,0,0,0.2);"></div>
+        <div style="width: 3.817px; height: 3.817px; border-radius: 50%; background: rgba(0,0,0,0.2);"></div>
+        <div style="width: 3.817px; height: 3.817px; border-radius: 50%; background: rgba(0,0,0,0.2);"></div>
+        <div style="width: 3.817px; height: 3.817px; border-radius: 50%; background: rgba(0,0,0,0.2);"></div>
+        <div style="width: 3.817px; height: 3.817px; border-radius: 50%; background: rgba(0,0,0,0.2);"></div>
+      </div>
+    </div>
+
+    <!-- ── 상품 기본 정보 ── -->
+    <div style="padding: 22.901px 19.084px 19.084px; display: flex; flex-direction: column; gap: 11.45px; background: #fff;">
+      <div style="display: flex; flex-direction: column; gap: 11.422px; width: 100%;">
+        <!-- 제목 + 찜 버튼 -->
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; width: 100%;">
+          <p style="font-size: 22.844px; font-weight: 500; color: #101010; letter-spacing: -0.9138px; line-height: 1.2; white-space: nowrap;">
+            iPhone 20 Air
+          </p>
+          <div style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21C12 21 3 14.5 3 8.5C3 6.01 5.01 4 7.5 4C9.24 4 10.91 5.01 11.72 6.55C11.86 6.82 12.14 6.82 12.28 6.55C13.09 5.01 14.76 4 16.5 4C18.99 4 21 6.01 21 8.5C21 14.5 12 21 12 21Z" stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <!-- 모델번호 -->
+        <p style="font-size: 11.422px; color: rgba(16,16,16,0.6); letter-spacing: -0.3427px; line-height: 1;">
+          SM-F766NZKAKOO
+        </p>
+        <!-- 가격 -->
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <p style="font-size: 13.326px; color: rgba(16,16,16,0.6); letter-spacing: -0.3998px; line-height: 1;">
+            최종 혜택 적용 예상가
+          </p>
+          <div style="display: flex; gap: 1.904px; align-items: center;">
+            <p style="font-size: 17.133px; font-weight: 500; color: #3617ce; letter-spacing: -0.6853px; line-height: 1.2;">17%</p>
+            <p style="font-size: 17.133px; font-weight: 700; color: #101010; letter-spacing: -0.6853px; line-height: 1.2;">1,225,000원</p>
+          </div>
+        </div>
+        <p style="font-size: 13.326px; color: rgba(16,16,16,0.6); letter-spacing: -0.3998px; line-height: 1; text-align: right;">
+          출고가 1,485,000원
+        </p>
+      </div>
+    </div>
+
+    <!-- ── 구분선 ── -->
+    <div style="height: 0.952px; margin: 0 20px; background: linear-gradient(to right, #fbfbfb, #f1f1f1 51.4%, #fbfbfb);"></div>
+
+    <!-- ── 색상 선택 ── -->
+    <div id="color-section" style="padding: 22.902px 29.52px; display: flex; flex-direction: column; gap: 15.229px;">
+      <p style="font-size: 13.326px; font-weight: 500; color: #101010; letter-spacing: -0.3998px; line-height: 1;">색상</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 9.518px; width: 100%;">
+        <!-- 코발트 바이올렛 -->
+        <div style="border: 0.952px solid #eaeaea; border-radius: 19.037px; padding: 19.037px 34.266px; display: flex; flex-direction: column; align-items: center; gap: 4.759px; cursor: default; pointer-events: none;">
+          <img src="https://www.figma.com/api/mcp/asset/cba57826-bf17-4e3a-9d03-fc668c049cc8" alt="" style="width: 20.941px; height: 20.941px; display: block;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1; white-space: nowrap;">코발트 바이올렛</p>
+        </div>
+        <!-- 블랙 -->
+        <div id="black-btn" style="border: 0.952px solid #eaeaea; border-radius: 19.037px; padding: 19.037px 34.266px; display: flex; flex-direction: column; align-items: center; gap: 4.759px; cursor: pointer; transition: border-color 0.25s ease;">
+          <img src="https://www.figma.com/api/mcp/asset/3f1dd3dd-3772-424f-9bda-4f62d6e3174b" alt="" style="width: 20.941px; height: 20.941px; display: block;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1; white-space: nowrap;">블랙</p>
+        </div>
+        <!-- 실버 -->
+        <div style="border: 0.952px solid #eaeaea; border-radius: 19.037px; padding: 19.037px 34.266px; display: flex; flex-direction: column; align-items: center; gap: 4.759px; cursor: default; pointer-events: none;">
+          <img src="https://www.figma.com/api/mcp/asset/5958aab8-2d41-4cdf-a359-a02e25693c5c" alt="" style="width: 20.941px; height: 20.941px; display: block;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1; white-space: nowrap;">실버</p>
+        </div>
+        <!-- 스카이 블루 -->
+        <div style="border: 0.952px solid #eaeaea; border-radius: 19.037px; padding: 19.037px 34.266px; display: flex; flex-direction: column; align-items: center; gap: 4.759px; cursor: default; pointer-events: none;">
+          <img src="https://www.figma.com/api/mcp/asset/db36f596-1dd5-433d-ae97-142a9d7bfb87" alt="" style="width: 20.941px; height: 20.941px; display: block;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1; white-space: nowrap;">스카이 블루</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 구분선 ── -->
+    <div style="height: 0.952px; margin: 0 20px; background: linear-gradient(to right, #fbfbfb, #f1f1f1 51.4%, #fbfbfb);"></div>
+
+    <!-- ── 용량 선택 ── -->
+    <div id="capacity-section" style="padding: 22.902px 29.52px; display: flex; flex-direction: column; gap: 15.229px;">
+      <p style="font-size: 13.326px; font-weight: 500; color: #101010; letter-spacing: -0.3998px; line-height: 1;">용량</p>
+      <div style="display: flex; flex-direction: column; gap: 9.518px; width: 100%;">
+        <div id="capacity-256-btn" style="border: 0.952px solid #eaeaea; border-radius: 15.229px; padding: 17.133px 19.037px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: border-color 0.25s ease;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1;">256GB</p>
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1;">1,254,000원</p>
+        </div>
+        <div style="border: 0.952px solid #eaeaea; border-radius: 15.229px; padding: 17.133px 19.037px; display: flex; align-items: center; justify-content: space-between; cursor: default; pointer-events: none;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1;">512GB</p>
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1;">1,507,000원</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 구분선 ── -->
+    <div style="height: 0.952px; margin: 0 20px; background: linear-gradient(to right, #fbfbfb, #f1f1f1 51.4%, #fbfbfb);"></div>
+
+    <!-- ── 수령 방법 ── -->
+    <div id="delivery-section" style="padding: 22.902px 29.52px; display: flex; flex-direction: column; gap: 15.229px;">
+      <p style="font-size: 13.326px; font-weight: 500; color: #101010; letter-spacing: -0.3998px; line-height: 1;">수령 방법</p>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 9.518px; width: 100%;">
+        <div style="border: 0.952px solid #eaeaea; border-radius: 19.037px; padding: 19.037px 34.266px; display: flex; flex-direction: column; align-items: center; gap: 9.518px; cursor: default; pointer-events: none;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1; white-space: nowrap;">바로 도착</p>
+          <div style="font-size: 11.422px; color: rgba(16,16,16,0.6); letter-spacing: -0.3427px; line-height: 1.3; text-align: center;">
+            <p>평일 기준</p>
+            <p>18시 주문까지 가능</p>
+          </div>
+        </div>
+        <div style="border: 0.952px solid #eaeaea; border-radius: 19.037px; padding: 19.037px 34.266px; display: flex; flex-direction: column; align-items: center; gap: 9.518px; cursor: default; pointer-events: none;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1; white-space: nowrap;">행복 배송</p>
+          <div style="font-size: 11.422px; color: rgba(16,16,16,0.6); letter-spacing: -0.3427px; line-height: 1.3; text-align: center;">
+            <p>평일 기준</p>
+            <p>15시 주문까지 가능</p>
+          </div>
+        </div>
+        <div style="border: 0.952px solid #eaeaea; border-radius: 19.037px; padding: 19.037px 34.266px; display: flex; flex-direction: column; align-items: center; gap: 9.518px; cursor: default; pointer-events: none;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1; white-space: nowrap;">택배</p>
+          <div style="font-size: 11.422px; color: rgba(16,16,16,0.6); letter-spacing: -0.3427px; line-height: 1.3; text-align: center;">
+            <p>평일 기준</p>
+            <p>18시 주문까지 가능</p>
+          </div>
+        </div>
+        <div id="delivery-pickup-btn" style="border: 0.952px solid #eaeaea; border-radius: 19.037px; padding: 19.037px 34.266px; display: flex; flex-direction: column; align-items: center; gap: 9.518px; cursor: pointer; transition: border-color 0.25s ease;">
+          <p style="font-size: 13.326px; color: #101010; letter-spacing: -0.3998px; line-height: 1; white-space: nowrap;">바로 픽업</p>
+          <div style="font-size: 11.422px; color: rgba(16,16,16,0.6); letter-spacing: -0.3427px; line-height: 1.3; text-align: center;">
+            <p>평일 기준</p>
+            <p>15시 주문까지 가능</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 상품 정보 탭 ── -->
+    <div style="border-top: 1px solid #f4f5fa; padding: 0 19.085px;">
+      <div style="display: flex; height: 54.64px; align-items: flex-end; padding-bottom: 0;">
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%;">
+          <p style="font-size: 14.57px; font-weight: 600; color: #060c1f; letter-spacing: -0.5828px; line-height: 1.3; padding-bottom: 0; white-space: nowrap;">상품 정보</p>
+          <div style="height: 1.821px; background: #060c1f; width: 100%; margin-top: 8px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 상품 이미지 상세 ── -->
+    <div style="position: relative; background: white; overflow: hidden;">
+      <img src="./assets_icon/IMG_7731 1.png" alt="iPhone 20 Air 상세"
+           style="width: 100%; display: block; object-fit: contain;">
+      <div style="position: absolute; bottom: 0; left: 0; right: 0; height: 91px;
+                  background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);"></div>
+    </div>
+
+    <!-- 상품 정보 더보기 버튼 -->
+    <div style="padding: 0 19.085px 22.902px; display: flex; justify-content: center;">
+      <button style="width: 100%; max-width: 321.465px; height: 43.712px; border: 0.911px solid #060c1f; border-radius: 16px;
+                     background: #fff; font-size: 12.75px; font-weight: 600; color: #060c1f;
+                     letter-spacing: -0.51px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+        상품 정보 더보기
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5.5 3.5L9 7L5.5 10.5" stroke="#060c1f" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <!-- ── 상품 정보 고시 / 아코디언 ── -->
+    <div style="border-top: 0.9px solid #f4f5fa; padding: 14.397px 19.085px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 10.435px;">
+        <p style="font-size: 14.4px; font-weight: 600; color: #060c1f; letter-spacing: -0.576px; line-height: 1.3;">상품 정보 고시</p>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 9L7 5L11 9" stroke="#060c1f" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div style="border-top: 0.9px solid #f4f5fa; padding: 14.397px 19.085px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 10.435px;">
+        <p style="font-size: 14.4px; font-weight: 600; color: #060c1f; letter-spacing: -0.576px; line-height: 1.3;">결제/변경/해지/환불 안내</p>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#060c1f" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div style="border-top: 0.9px solid #f4f5fa; padding: 14.397px 19.085px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 10.435px;">
+        <p style="font-size: 14.4px; font-weight: 600; color: #060c1f; letter-spacing: -0.576px; line-height: 1.3;">배송/교환/반품 안내</p>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#060c1f" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div style="border-top: 0.9px solid #f4f5fa; padding: 14.397px 19.085px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 10.435px;">
+        <p style="font-size: 14.4px; font-weight: 600; color: #060c1f; letter-spacing: -0.576px; line-height: 1.3;">상품 이용 안내</p>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#060c1f" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div style="border-top: 0.9px solid #f4f5fa; padding: 14.397px 19.085px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 10.435px;">
+        <p style="font-size: 14.4px; font-weight: 600; color: #060c1f; letter-spacing: -0.576px; line-height: 1.3;">선물하기 이용 안내</p>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#060c1f" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+    <div style="border-top: 0.9px solid #f4f5fa; border-bottom: 0.9px solid #f4f5fa; padding: 14.397px 19.085px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 0 10.435px;">
+        <p style="font-size: 14.4px; font-weight: 600; color: #060c1f; letter-spacing: -0.576px; line-height: 1.3;">판매자 정보</p>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#060c1f" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <!-- ── 푸터 ── -->
+    <div style="background: rgba(0,0,0,0.05); padding: 30.536px 19.085px 114.511px; display: flex; flex-direction: column; gap: 28.628px;">
+      <div style="display: flex; gap: 7.634px; align-items: center; flex-wrap: wrap;">
+        <p style="font-size: 12.75px; font-weight: 600; color: rgba(12,27,65,0.67); letter-spacing: -0.51px; white-space: nowrap;">이용약관</p>
+        <div style="width: 0.954px; height: 9.543px; background: rgba(13,47,138,0.12);"></div>
+        <p style="font-size: 12.75px; font-weight: 600; color: rgba(12,27,65,0.67); letter-spacing: -0.51px; white-space: nowrap;">전자금융거래 이용약관</p>
+        <div style="width: 0.954px; height: 9.543px; background: rgba(13,47,138,0.12);"></div>
+        <p style="font-size: 12.75px; font-weight: 600; color: rgba(12,27,65,0.67); letter-spacing: -0.51px; white-space: nowrap;">개인정보처리방침</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 3.817px;">
+        <div style="display: flex; gap: 7.634px; align-items: center;">
+          <p style="font-size: 12.75px; font-weight: 500; color: rgba(12,27,65,0.67); letter-spacing: -0.51px; white-space: nowrap;">사업자: SK플래닛(주)</p>
+          <div style="width: 0.954px; height: 9.543px; background: rgba(12,27,65,0.67);"></div>
+          <p style="font-size: 12.75px; font-weight: 500; color: rgba(12,27,65,0.67); letter-spacing: -0.51px; white-space: nowrap;">대표 : 유재욱</p>
+        </div>
+        <p style="font-size: 12.75px; font-weight: 500; color: rgba(12,27,65,0.67); letter-spacing: -0.51px;">사업자등록번호 : 815-81-01244</p>
+        <p style="font-size: 12.75px; font-weight: 500; color: rgba(12,27,65,0.67); letter-spacing: -0.51px;">경기도 성남시 분당구 판교로 264(삼평동)</p>
+        <p style="font-size: 12.75px; font-weight: 500; color: rgba(12,27,65,0.67); letter-spacing: -0.51px;">통신판매업신고 : 2014-경기성남-0036</p>
+        <p style="font-size: 12.75px; font-weight: 500; color: rgba(12,27,65,0.67); letter-spacing: -0.51px;">전화 : 1800-0133</p>
+      </div>
+      <p style="font-size: 12.75px; font-weight: 500; color: rgba(12,27,65,0.67); letter-spacing: -0.51px;">Copyright ©️ SK Planet All Rights Reserved</p>
+    </div>
+
+  </div><!-- /.app-scroll -->
+
+  <!-- ── CTA 바 ── -->
+  <div class="cta-bar">
+    <!-- AI 인사이트 라벨 -->
+    <div id="ai-insight-label" style="
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+      pointer-events: none;
+      position: relative; z-index: 2;
+    ">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 5px; padding-bottom: 10px;">
+        <svg width="10" height="10" viewBox="0 0 22 22" fill="none" style="flex-shrink:0;">
+          <path d="M11 2L12.8 8.2L19 10L12.8 11.8L11 18L9.2 11.8L3 10L9.2 8.2L11 2Z" fill="#5b2bc3"/>
+          <path d="M17 14L17.9 16.1L20 17L17.9 17.9L17 20L16.1 17.9L14 17L16.1 16.1L17 14Z" fill="#5b2bc3" opacity="0.6"/>
+        </svg>
+        <p id="ai-insight-text" style="font-size: 12.75px; font-weight: 500; color: rgba(16,16,16,0.75); letter-spacing: -0.38px; line-height: 1; white-space: nowrap;">
+          30대 남성 고객이 가장 많이 선택한 색상은 블랙이에요.
+        </p>
+      </div>
+    </div>
+    <!-- 배경 그라디언트 -->
+    <div style="
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 200px; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0.92) 35%, #fff 55%, #fff 100%);
+      transform: translateY(33px);
+    "></div>
+
+    <!-- 버튼 필 -->
+    <div class="cta-pill" style="
+      position: relative;
+      background: #C4C6CC;
+      border-radius: 953.244px;
+      height: 57.252px;
+      display: flex; align-items: center;
+      gap: 19.084px;
+      padding: 0 26.718px;
+      box-shadow: 0 0 9.542px rgba(0,0,0,0.05);
+      cursor: pointer;
+    ">
+      <!-- AI 아이콘 (22.901px) -->
+      <div style="width: 22.901px; height: 22.901px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11 2L12.8 8.2L19 10L12.8 11.8L11 18L9.2 11.8L3 10L9.2 8.2L11 2Z" fill="white"/>
+          <path d="M17 14L17.9 16.1L20 17L17.9 17.9L17 20L16.1 17.9L14 17L16.1 16.1L17 14Z" fill="white" opacity="0.7"/>
+        </svg>
+      </div>
+      <!-- 세로 구분선 -->
+      <div style="width: 0.954px; height: 7.634px; background: rgba(255,255,255,0.5); flex-shrink: 0;"></div>
+      <!-- 텍스트 -->
+      <p id="cta-text" style="
+        flex: 1; text-align: right;
+        font-size: 13.36px; font-weight: 500; color: #fff;
+        letter-spacing: -0.1336px; line-height: 1.4;
+        white-space: nowrap;
+      ">상세 옵션 선택하기</p>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- ── 헤더 (fixed over scroll) ── -->
+<style>
+  .page-header {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 11.45px 19.084px;
+    z-index: 50;
+    pointer-events: none;
+  }
+  @media (max-width: 767px) {
+    .page-header { position: fixed; }
+  }
+  .page-header > * { pointer-events: all; }
+  .header-btn {
+    width: 45.802px; height: 45.802px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 999px;
+    box-shadow: 0 0 19.084px rgba(0,0,0,0.05);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; border: none; outline: none;
+  }
+</style>
+
+<div class="page-header" id="pageHeader">
+  <!-- 뒤로가기 -->
+  <button class="header-btn" onclick="goBack()">
+    <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M14 18L7 11L14 4" stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+</div>
+
+<script>
+  // 데스크탑에서 헤더를 #app 기준으로 이동
+  function goBack() {
+    window.location.href = './scenario3.html';
+  }
+
+  (function() {
+    var app = document.getElementById('app');
+    var header = document.getElementById('pageHeader');
+    if (app && header && window.innerWidth >= 768) {
+      app.appendChild(header);
+      header.style.position = 'absolute';
+    }
+  })();
+
+  // 스크롤 위치별 AI 인사이트 표시
+  // 색상(400px~) / 용량(600px~) 구간으로 구분
+  // Figma 프레임 9109-16843 scrollTop≈400, 9109-17658 scrollTop≈624
+  (function() {
+    var blackBtn       = document.getElementById('black-btn');
+    var cap256Btn      = document.getElementById('capacity-256-btn');
+    var pickupBtn      = document.getElementById('delivery-pickup-btn');
+    var ctaPill        = document.querySelector('.cta-pill');
+    var aiLabel        = document.getElementById('ai-insight-label');
+    var aiLabelText    = document.getElementById('ai-insight-text');
+    var appScroll      = document.querySelector('.app-scroll');
+    var isDesktop      = window.innerWidth >= 768;
+
+    // Figma 프레임 scrollTop 기준:
+    // 색상 frame(9109-16843) ≈ 400, 용량 frame(9109-17658) ≈ 600, 수령 frame(9109-18968) ≈ 780
+    var COLOR_TRIGGER    = 400;
+    var CAPACITY_TRIGGER = 600;
+    var DELIVERY_TRIGGER = 780;
+
+    function showLabel(text) {
+      aiLabelText.textContent = text;
+      aiLabel.style.maxHeight = '40px';
+      aiLabel.style.opacity   = '1';
+    }
+    function hideLabel() {
+      aiLabel.style.maxHeight = '0';
+      aiLabel.style.opacity   = '0';
+    }
+
+    // scroll → AI 라벨 텍스트만 제어
+    function checkScroll() {
+      var scrollTop = isDesktop ? appScroll.scrollTop
+                                : (window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0);
+      if      (scrollTop >= DELIVERY_TRIGGER)  showLabel('오늘 중 수령을 원한다면 바로 픽업이 가장 빨라요.');
+      else if (scrollTop >= CAPACITY_TRIGGER)  showLabel('최근 사용 패턴 기준으로는 256G면 충분해요.');
+      else if (scrollTop >= COLOR_TRIGGER)     showLabel('30대 남성 고객이 가장 많이 선택한 색상은 블랙이에요.');
+      else                                     hideLabel();
+    }
+
+    var scrollEl = isDesktop ? appScroll : window;
+    scrollEl.addEventListener('scroll', checkScroll, { passive: true });
+    checkScroll();
+
+    // 클릭 선택 → CTA 활성화 제어
+    var colorSelected    = false;
+    var capacitySelected = false;
+    var deliverySelected = false;
+
+    function updateCTA() {
+      var allSelected = colorSelected && capacitySelected && deliverySelected;
+      ctaPill.style.background = allSelected ? '#111'     : '#C4C6CC';
+      ctaPill.style.cursor     = allSelected ? 'pointer'  : 'default';
+    }
+
+    function dimSiblings(sectionSelector, selectedBtn) {
+      document.querySelectorAll(sectionSelector + ' > div > div').forEach(function(btn) {
+        if (btn !== selectedBtn) btn.style.opacity = '0.4';
+      });
+    }
+
+    blackBtn.addEventListener('click', function() {
+      colorSelected = true;
+      blackBtn.style.borderColor = '#222';
+      dimSiblings('#color-section', blackBtn);
+      updateCTA();
+    });
+
+    cap256Btn.addEventListener('click', function() {
+      capacitySelected = true;
+      cap256Btn.style.borderColor = '#222';
+      dimSiblings('#capacity-section', cap256Btn);
+      updateCTA();
+    });
+
+    pickupBtn.addEventListener('click', function() {
+      deliverySelected = true;
+      pickupBtn.style.borderColor = '#222';
+      dimSiblings('#delivery-section', pickupBtn);
+      updateCTA();
+    });
+
+    ctaPill.addEventListener('click', function() {
+      if (colorSelected && capacitySelected && deliverySelected) {
+        sessionStorage.removeItem('s33_selected');
+        window.location.href = './scenario3-3.html';
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>장바구니 — SKT ConShopping</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif; }
+
+    /* ── 데스크탑: 폰 프레임 ── */
+    @media (min-width: 768px) {
+      body { background: #a8aab4; display: flex; align-items: center; justify-content: center; min-height: 100dvh; }
+      #app { position: relative; width: 375px; height: 812px; overflow: hidden; border-radius: 32px;
+             box-shadow: 0 40px 100px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06); flex-shrink: 0; }
+      .app-scroll { position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+      .app-scroll::-webkit-scrollbar { display: none; }
+      .bottom-bar { position: absolute; }
+    }
+    /* ── 모바일 ── */
+    @media (max-width: 767px) {
+      body { background: #fff; }
+      #app { position: relative; width: 100%; min-height: 100dvh; }
+      .app-scroll { width: 100%; overflow-x: hidden; position: relative; }
+      .bottom-bar { position: fixed; }
+    }
+
+    /* ── 페이지 전환 ── */
+    @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+    .app-scroll { animation: slideInRight 0.28s cubic-bezier(0.4,0,0.2,1) forwards; padding-top: 68px; }
+
+    /* ── 고정 헤더 ── */
+    #page-header {
+      position: absolute; top: 0; left: 0; right: 0; z-index: 30;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    }
+    @media (max-width: 767px) { #page-header { position: fixed; } }
+
+    /* ── 하단 CTA ── */
+    .bottom-bar {
+      bottom: 0; left: 0; right: 0; z-index: 40;
+      padding: 16px 20px 34px;
+      background: white;
+      border-top: 1px solid rgba(35,55,155,0.05);
+    }
+
+    /* ── 섹션 구분선 ── */
+    .section-divider { height: 4px; background: rgba(35,55,155,0.05); flex-shrink: 0; }
+
+    /* ── 섹션 영역 ── */
+    .cart-section { padding: 28px 20px 32px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* ── 카드 ── */
+    .cart-card { background: white; border-radius: 24px; border: 1.5px solid rgba(5,42,142,0.08); position: relative; }
+
+    /* ── 정보 박스 ── */
+    .info-box { background: rgba(35,55,155,0.05); border-radius: 16px; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; }
+    .info-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; min-height: 20px; }
+    .ir-label { font-size: 16px; font-weight: 400; color: #060c1f; letter-spacing: -0.64px; line-height: 1.3; white-space: nowrap; flex-shrink: 0; }
+    .ir-value { font-size: 16px; font-weight: 400; color: #060c1f; letter-spacing: -0.64px; line-height: 1.3; text-align: right; flex: 1; min-width: 0; }
+    .ir-bold { font-weight: 600; }
+    .ir-right-only { font-size: 16px; font-weight: 400; color: #060c1f; letter-spacing: -0.64px; line-height: 1.3; text-align: right; width: 100%; }
+    .info-divider { height: 1px; background: rgba(5,42,142,0.08); margin: 6px 0; }
+
+    /* ── 구독 로고 행 ── */
+    .logo-row { display: flex; gap: 8px; align-items: flex-start; }
+    .svc-label { font-size: 13px; font-weight: 500; color: rgba(12,34,91,0.42); letter-spacing: -0.52px; line-height: 1.3; margin-bottom: 2px; }
+    .svc-name  { font-size: 16px; font-weight: 400; color: #060c1f; letter-spacing: -0.64px; line-height: 1.3; }
+
+    /* ── 변경 링크 ── */
+    .change-btn { font-size: 13px; font-weight: 500; color: rgba(12,27,65,0.67); letter-spacing: -0.52px; line-height: 1.3;
+                  text-decoration: underline; text-align: center; background: none; border: none; cursor: pointer;
+                  font-family: inherit; width: 100%; padding: 2px 0; }
+
+    /* ── AI 패널 ── */
+    .ai-panel { background: #ece8ff; border-radius: 24px; padding: 16px; display: flex; flex-direction: column; gap: 16px; margin: 0 20px 28px; }
+    .ai-card  { background: white; border-radius: 24px; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── 테스트 종료 토스트 ── */
+    #test-toast {
+      position: absolute;
+      bottom: 116px; left: 50%;
+      transform: translateX(-50%) translateY(24px);
+      width: 250px; border-radius: 52px;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(0,0,0,0.8);
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 14px;
+      cursor: pointer; z-index: 50;
+      opacity: 0;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      pointer-events: none;
+    }
+    #test-toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    @media (max-width: 767px) { #test-toast { position: fixed; } }
+  </style>
+</head>
+<body>
+<div id="app" style="background:#fff;">
+
+  <!-- ── 고정 헤더 ── -->
+  <div id="page-header">
+    <div style="display:flex; align-items:center; gap:8px; padding:11px 19px;">
+      <button onclick="goBack()" style="width:46px; height:46px; background:rgba(255,255,255,0.4); border-radius:999px; box-shadow:0 0 19px rgba(0,0,0,0.05); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M14 18L7 11L14 4" stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <p style="font-size:18px; font-weight:600; color:#060c1f; letter-spacing:-0.9px; line-height:1.3;">장바구니</p>
+    </div>
+  </div>
+
+  <div class="app-scroll">
+    <div style="display:flex; flex-direction:column;">
+
+      <!-- 전체 선택 바 -->
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:20px; gap:5px;">
+        <div style="display:flex; align-items:center; gap:8px; cursor:pointer; flex:1;" onclick="toggleAll()">
+          <div id="check-all" data-checked="true" style="width:20px; height:20px; flex-shrink:0; line-height:0;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect width="20" height="20" rx="10" fill="#060C1F"/><path d="M5.5 10L8.5 13L14.5 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <p style="font-size:16px; font-weight:400; color:#060c1f; letter-spacing:-0.64px; line-height:1.3;">전체 선택</p>
+        </div>
+        <button style="background:rgba(13,47,138,0.12); border:none; border-radius:9999px; padding:6px 12px; cursor:pointer; font-size:12px; font-weight:600; color:rgba(12,27,65,0.67); letter-spacing:-0.48px; font-family:inherit;">선택 삭제</button>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ════ 휴대폰 섹션 ════ -->
+      <div class="cart-section">
+        <p style="font-size:18px; font-weight:600; color:#060c1f; letter-spacing:-0.9px; line-height:1.3;">휴대폰</p>
+
+        <div class="cart-card">
+          <!-- 체크박스 -->
+          <div class="check-box" data-checked="true" data-price="118700" onclick="toggleCheck(this)"
+               style="position:absolute; top:20px; left:20px; width:20px; height:20px; cursor:pointer; z-index:1; line-height:0;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect width="20" height="20" rx="10" fill="#060C1F"/><path d="M5.5 10L8.5 13L14.5 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <div style="padding:56px 18px 20px; display:flex; flex-direction:column; gap:14px;">
+            <!-- 상품 행 -->
+            <div style="display:flex; gap:12px; align-items:flex-start;">
+              <div style="width:48px; height:48px; border-radius:8px; overflow:hidden; flex-shrink:0; background:rgba(35,55,155,0.05);">
+                <img src="./assets_icon/iphoneair20.png" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:4px;">
+                <p style="font-size:15px; font-weight:600; color:#060c1f; letter-spacing:-0.75px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">iphone 20 Air</p>
+                <p style="font-size:13px; font-weight:500; color:rgba(12,34,91,0.42); letter-spacing:-0.52px; line-height:1.3;">Black · 256GB · 빠른배송</p>
+              </div>
+            </div>
+
+            <!-- 정보 박스 -->
+            <div class="info-box">
+              <div class="info-row">
+                <span class="ir-label">요금제</span>
+                <span class="ir-value">6GX 프라임</span>
+              </div>
+              <div class="info-row">
+                <span class="ir-label">혜택</span>
+                <span class="ir-value">넷플릭스 광고형 스탠다드</span>
+              </div>
+              <p class="ir-right-only">ChatGPT Plus 이용권</p>
+              <div class="info-row">
+                <span class="ir-label">부가서비스</span>
+                <span class="ir-value">T 에이전트 프로</span>
+              </div>
+              <div class="info-divider"></div>
+              <div class="info-row">
+                <span class="ir-label ir-bold">납부 금액</span>
+                <span class="ir-value ir-bold">월 118,700원</span>
+              </div>
+            </div>
+
+            <button class="change-btn">변경</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ════ 구독 상품 섹션 ════ -->
+      <div class="cart-section">
+        <p style="font-size:18px; font-weight:600; color:#060c1f; letter-spacing:-0.9px; line-height:1.3;">구독 상품</p>
+
+        <!-- 카드 1: 배민 + YouTube -->
+        <div class="cart-card">
+          <div class="check-box" data-checked="true" data-price="14900" onclick="toggleCheck(this)"
+               style="position:absolute; top:20px; left:20px; width:20px; height:20px; cursor:pointer; z-index:1; line-height:0;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect width="20" height="20" rx="10" fill="#060C1F"/><path d="M5.5 10L8.5 13L14.5 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <div style="padding:56px 18px 20px; display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:48px; height:48px; border-radius:8px; overflow:hidden; flex-shrink:0; background:rgba(35,55,155,0.05);">
+                <img src="./assets_icon/cartsubscription1.png" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <div style="flex:1; min-width:0;">
+                <p style="font-size:15px; font-weight:600; color:#060c1f; letter-spacing:-0.75px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">YouTube Premium Lite 이용권, 배달의민족 3,000원 쿠폰 3장</p>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <div class="logo-row">
+                <img src="./assets_icon/subscription1-1.png"
+                     style="width:32px; height:32px; object-fit:cover; flex-shrink:0; border-radius:6px; margin-top:2px;">
+                <div style="flex:1; min-width:0;">
+                  <p class="svc-label">배달의민족</p>
+                  <p class="svc-name">배달의민족 3,000원 쿠폰 3장</p>
+                </div>
+              </div>
+              <div class="logo-row" style="margin-top:8px;">
+                <img src="./assets_icon/subscription1-2.png"
+                     style="width:32px; height:32px; object-fit:cover; flex-shrink:0; border-radius:6px; margin-top:2px;">
+                <div style="flex:1; min-width:0;">
+                  <p class="svc-label">Youtube</p>
+                  <p class="svc-name">YouTube Premium Lite 이용권</p>
+                </div>
+              </div>
+              <div class="info-divider" style="margin-top:10px;"></div>
+              <div class="info-row">
+                <span class="ir-label ir-bold">구독가</span>
+                <span class="ir-value ir-bold">월 14,900원</span>
+              </div>
+            </div>
+
+            <button class="change-btn">변경</button>
+          </div>
+        </div>
+
+        <!-- 카드 2: Netflix + Wavve -->
+        <div class="cart-card">
+          <div class="check-box" data-checked="true" data-price="14900" onclick="toggleCheck(this)"
+               style="position:absolute; top:20px; left:20px; width:20px; height:20px; cursor:pointer; z-index:1; line-height:0;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect width="20" height="20" rx="10" fill="#060C1F"/><path d="M5.5 10L8.5 13L14.5 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <div style="padding:56px 18px 20px; display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:48px; height:48px; border-radius:8px; overflow:hidden; flex-shrink:0; background:rgba(35,55,155,0.05);">
+                <img src="./assets_icon/subscription1-2.png" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <div style="flex:1; min-width:0;">
+                <p style="font-size:15px; font-weight:600; color:#060c1f; letter-spacing:-0.75px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Disney+ 프리미엄 이용권, Netflix 이용권, Wavve 콘텐츠팩 플러스</p>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <div class="logo-row">
+                <img src="https://www.figma.com/api/mcp/asset/75fa99d5-be4f-45fd-9fcd-0c9006abc783"
+                     style="width:32px; height:32px; object-fit:cover; flex-shrink:0; border-radius:6px; margin-top:2px;">
+                <div style="flex:1; min-width:0;">
+                  <p class="svc-label">Netflix</p>
+                  <p class="svc-name">Netflix 광고형 스탠다드 이용권</p>
+                </div>
+              </div>
+              <div class="logo-row" style="margin-top:8px;">
+                <img src="https://www.figma.com/api/mcp/asset/7bc45af1-793c-42a8-9ac8-9846a69e9725"
+                     style="width:32px; height:32px; object-fit:cover; flex-shrink:0; border-radius:6px; margin-top:2px;">
+                <div style="flex:1; min-width:0;">
+                  <p class="svc-label">Wavve</p>
+                  <p class="svc-name">Wavve 콘텐츠 팩 플러스</p>
+                </div>
+              </div>
+              <div class="info-divider" style="margin-top:10px;"></div>
+              <div class="info-row">
+                <span class="ir-label ir-bold">구독가</span>
+                <span class="ir-value ir-bold">월 14,900원</span>
+              </div>
+            </div>
+
+            <button class="change-btn">변경</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ════ 인터넷/B tv 섹션 ════ -->
+      <div class="cart-section">
+        <p style="font-size:18px; font-weight:600; color:#060c1f; letter-spacing:-0.9px; line-height:1.3;">인터넷/B tv</p>
+
+        <div class="cart-card">
+          <div class="check-box" data-checked="true" data-price="37400" onclick="toggleCheck(this)"
+               style="position:absolute; top:18px; left:20px; width:20px; height:20px; cursor:pointer; z-index:1; line-height:0;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect width="20" height="20" rx="10" fill="#060C1F"/><path d="M5.5 10L8.5 13L14.5 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+
+          <div style="padding:56px 18px 20px; display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <div style="width:48px; height:48px; border-radius:8px; overflow:hidden; flex-shrink:0; background:rgba(0,0,0,0.06);">
+                <img src="./assets_icon/cartsubscriptiontv.png" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <div style="flex:1; min-width:0;">
+                <p style="font-size:15px; font-weight:600; color:#060c1f; letter-spacing:-0.75px; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">기가라이트 쉐어</p>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <div class="info-row">
+                <span class="ir-label ir-bold">구독가</span>
+                <span class="ir-value ir-bold">월 37,400원</span>
+              </div>
+            </div>
+
+            <button class="change-btn">변경</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <!-- ════ T 에이전트 AI 추천 ════ -->
+      <div style="padding:20px 0 0;">
+        <div class="ai-panel">
+
+          <!-- 분석 헤더 -->
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; gap:2px;">
+              <img src="https://www.figma.com/api/mcp/asset/988c5b7a-625a-4643-8585-4e2889f2806d"
+                   style="width:18px; height:18px; flex-shrink:0;">
+              <p style="font-size:12px; font-weight:600; color:#5940df; letter-spacing:-0.4px; line-height:1.4;">T 에이전트 분석</p>
+            </div>
+            <p style="font-size:12px; font-weight:400; color:#5940df; letter-spacing:-0.2px; line-height:1.5;">iphone 20 Air 블랙과 T 에이전트 프로를 담으셨네요. 민수님처럼 생산성을 중시하는 VIP 고객이 함께 묶었을 때 시너지가 나는 상품을 가져왔어요.</p>
+          </div>
+
+          <!-- 구분선 -->
+          <div style="height:1px; background:rgba(255,255,255,0.8);"></div>
+
+          <!-- 추천 카드 1 -->
+          <div class="ai-card">
+            <div style="display:flex; align-items:center; gap:3px;">
+              <img src="https://www.figma.com/api/mcp/asset/a007ff09-2f8b-4235-a786-ad187ae8c414"
+                   style="width:18px; height:18px; flex-shrink:0;">
+              <p style="font-size:13px; font-weight:500; color:#5940df; letter-spacing:-0.39px; line-height:1.4;">다중 스마트기기 유저에게 필수예요.</p>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:8px;">
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <p style="font-size:14px; font-weight:500; color:#666; letter-spacing:-0.6px; line-height:1.3; white-space:nowrap;">6G XR 글래스 &amp; 워치 쉐어링</p>
+                <p style="font-size:15px; font-weight:600; color:#000; letter-spacing:-0.6px; line-height:1.3;">월 5,000원</p>
+              </div>
+              <button style="font-size:12px; font-weight:500; color:#202020; background:white; border:1px solid #e0e0e0; border-radius:12px; height:33px; width:89px; cursor:pointer; font-family:inherit; flex-shrink:0;">바로 담기</button>
+            </div>
+          </div>
+
+          <!-- 추천 카드 2 -->
+          <div class="ai-card">
+            <div style="display:flex; align-items:center; gap:3px;">
+              <img src="https://www.figma.com/api/mcp/asset/a007ff09-2f8b-4235-a786-ad187ae8c414"
+                   style="width:18px; height:18px; flex-shrink:0;">
+              <p style="font-size:13px; font-weight:500; color:#5940df; letter-spacing:-0.39px; line-height:1.4;">30대 VIP 남성 만족도 1위 상품이에요.</p>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:8px;">
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <p style="font-size:14px; font-weight:500; color:#666; letter-spacing:-0.6px; line-height:1.3; white-space:nowrap;">B tv 8K 무손실 홈시어터 팩</p>
+                <p style="font-size:15px; font-weight:600; color:#000; letter-spacing:-0.6px; line-height:1.3;">월 16,500원</p>
+              </div>
+              <button style="font-size:12px; font-weight:500; color:#202020; background:white; border:1px solid #e0e0e0; border-radius:12px; height:33px; width:89px; cursor:pointer; font-family:inherit; flex-shrink:0;">바로 담기</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /content -->
+
+    <div style="height:100px;"></div>
+
+  </div><!-- /.app-scroll -->
+
+  <!-- ── 테스트 종료 토스트 ── -->
+  <div id="test-toast" onclick="endTest()">
+    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:5px;">
+      <p style="font-size:14.5px; font-weight:700; color:white; letter-spacing:-0.3px; line-height:1.3;">테스트 완료하기</p>
+      <p style="font-size:12px; font-weight:400; color:rgba(255,255,255,0.85); letter-spacing:-0.2px; line-height:1.45;">다음 테스트로 넘어가시려면 눌러주세요.</p>
+    </div>
+    <svg width="7" height="12" viewBox="0 0 7 12" fill="none" style="flex-shrink:0;">
+      <path d="M1 1L6 6L1 11" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <!-- ── 하단 CTA ── -->
+  <div class="bottom-bar">
+    <button id="cta-btn" onclick="goCheckout()"
+            style="width:100%; border-radius:20px; height:56px; background:#000; color:white; border:none; cursor:pointer;
+                   font-size:16px; font-weight:600; letter-spacing:-0.64px; line-height:1.3; font-family:inherit;">
+      118,700원 결제하기
+    </button>
+  </div>
+
+</div><!-- /#app -->
+
+<script>
+  function goBack()    { window.location.href = './scenario3-10.html'; }
+  function goCheckout(){ /* 결제 페이지 */ }
+
+  var EMPTY  = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="0.5" y="0.5" width="19" height="19" rx="9.5" fill="white" stroke="#D1D1D6"/></svg>';
+  var FILLED = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect width="20" height="20" rx="10" fill="#060C1F"/><path d="M5.5 10L8.5 13L14.5 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  function toggleCheck(el) {
+    var on = el.dataset.checked === 'true';
+    el.dataset.checked = on ? 'false' : 'true';
+    el.innerHTML = on ? EMPTY : FILLED;
+    syncAll();
+    updateTotal();
+  }
+
+  function toggleAll() {
+    var allEl = document.getElementById('check-all');
+    var on = allEl.dataset.checked === 'true';
+    allEl.dataset.checked = on ? 'false' : 'true';
+    allEl.innerHTML = on ? EMPTY : FILLED;
+    document.querySelectorAll('.check-box').forEach(function(cb) {
+      cb.dataset.checked = on ? 'false' : 'true';
+      cb.innerHTML = on ? EMPTY : FILLED;
+    });
+    updateTotal();
+  }
+
+  function syncAll() {
+    var boxes = document.querySelectorAll('.check-box');
+    var allOn = Array.from(boxes).every(function(b) { return b.dataset.checked === 'true'; });
+    var el = document.getElementById('check-all');
+    el.dataset.checked = allOn ? 'true' : 'false';
+    el.innerHTML = allOn ? FILLED : EMPTY;
+  }
+
+  function updateTotal() {
+    var total = 0;
+    document.querySelectorAll('.check-box').forEach(function(cb) {
+      if (cb.dataset.checked === 'true') {
+        total += parseInt(cb.dataset.price, 10) || 0;
+      }
+    });
+    var btn = document.getElementById('cta-btn');
+    if (total > 0) {
+      btn.textContent = total.toLocaleString() + '원 결제하기';
+      btn.style.background = '#000';
+      btn.style.cursor = 'pointer';
+    } else {
+      btn.textContent = '상품을 선택해주세요';
+      btn.style.background = 'rgba(91,91,91,0.2)';
+      btn.style.cursor = 'default';
+    }
+  }
+
+  (function() {
+    var app = document.getElementById('app');
+    if (app && window.innerWidth >= 768) {
+      var bar = document.querySelector('.bottom-bar');
+      if (bar) app.appendChild(bar);
+    }
+    updateTotal();
+  })();
+
+  setTimeout(function() {
+    var toast = document.getElementById('test-toast');
+    if (toast) toast.classList.add('visible');
+  }, 4000);
+
+  function endTest() {
+    window.location.href = './scenario-home.html';
+  }
+</script>
+</body>
+</html>

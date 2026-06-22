@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scenario 3</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Pretendard Variable Font -->
+  <link rel="stylesheet" crossorigin
+    href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+
+  <style>
+    *, *::before, *::after {
+      font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+                   'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ── 데스크톱: 중앙 375×812 프레임 ── */
+    @media (min-width: 768px) {
+      body {
+        background: #a8aab4;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100dvh;
+      }
+      #app {
+        position: relative;          /* GNB absolute 기준점 */
+        width: 375px;
+        height: 812px;
+        overflow: hidden;
+        border-radius: 32px;
+        box-shadow:
+          0 40px 100px rgba(0,0,0,0.22),
+          0  0   0 1px  rgba(0,0,0,0.06);
+        flex-shrink: 0;
+      }
+      /* 스크롤 영역: 프레임 전체를 꽉 채움 (GNB 밑으로 들어감) */
+      .app-scroll {
+        position: absolute;
+        inset: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;
+      }
+      .app-scroll::-webkit-scrollbar { display: none; }
+      /* GNB: 프레임 최하단에 얹힘 */
+      .app-gnb {
+        position: absolute;
+        bottom: 0; left: 0;
+        width: 100%;
+        z-index: 50;
+        pointer-events: none;
+      }
+      .app-gnb .gnb-bar { pointer-events: all; }
+    }
+
+    /* ── 모바일: 375px 기준 scale to fit ── */
+    @media (max-width: 767px) {
+      html, body { overflow: hidden; height: 100%; background: #d2d4d9; }
+      .app-scroll {
+        position: absolute;
+        inset: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        scrollbar-width: none;
+      }
+      .app-scroll::-webkit-scrollbar { display: none; }
+      .app-gnb {
+        position: absolute;
+        bottom: 0; left: 0;
+        width: 100%;
+        z-index: 50;
+        pointer-events: none;
+      }
+      .app-gnb .gnb-bar { pointer-events: all; }
+      #scroll-hint { position: absolute; }
+    }
+
+    /* ── 페이지 전환 애니메이션 ── */
+    @keyframes slideOutLeft {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-100%); }
+    }
+    @keyframes slideInFromLeft {
+      from { transform: translateX(-30%); opacity: 0.6; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    .icon-btn { -webkit-tap-highlight-color: transparent; }
+    .icon-btn:active { opacity: 0.55; }
+
+    /* ── 탭 공통 스타일 ── */
+    .tab-pill {
+      background: rgba(255,255,255,0.5);
+      border-radius: 95.42px;
+      padding: 3.817px 11.45px 3.817px 3.817px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7.634px;
+      flex-shrink: 0;
+    }
+    .tab-icon-circle {
+      width: 30.534px;
+      height: 30.534px;
+      border-radius: 953px;
+      background: white;
+      box-shadow: 0 0 11.45px rgba(0,0,0,0.04);
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .tab-label {
+      font-size: 13.359px;
+      font-weight: 500;
+      color: #101010;
+      letter-spacing: -0.9542px;
+      line-height: 1.4;
+      white-space: nowrap;
+      text-align: center;
+    }
+    /* ── Touch area guide ── */
+    @keyframes touchGuideIn {
+      0%   { opacity: 0; transform: scale(0.97); }
+      12%  { opacity: 1; transform: scale(1); }
+      80%  { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1); }
+    }
+    #thumb-highlight.active {
+      animation: touchGuideIn 2s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+
+    /* ── Scroll hint ── */
+    @keyframes scrollHintIn {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      14%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      80%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+      100% { opacity: 0; transform: translateX(-50%) translateY(0); }
+    }
+    #scroll-hint {
+      position: absolute;
+      bottom: 140px; left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: rgba(89,64,223,0.88);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(89,64,223,0.95);
+      border-radius: 52px;
+      padding: 16px 28px;
+      display: flex; align-items: center; gap: 10px;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 60;
+      white-space: nowrap;
+    }
+    #scroll-hint.active {
+      animation: scrollHintIn 2.2s cubic-bezier(0.4,0,0.2,1) forwards;
+    }
+    @media (max-width: 767px) { #scroll-hint { position: fixed; } }
+  </style>
+</head>
+
+<body>
+  <div id="app" class="bg-[#d2d4d9]">
+  <div class="app-scroll bg-[#d2d4d9]">
+
+    <!-- ═══════════════════════════════════════════════════
+         HEADER  (Figma node 9109:12854)
+         absolute top-0 · px 20 · py 12 · justify-between
+         Left : 48×48 빈 영역
+         Right: 바코드 · 장바구니 · 햄버거  각 48×48, gap 6
+    ═══════════════════════════════════════════════════ -->
+    <header class="absolute top-0 left-0 w-full z-10
+                   flex items-center justify-between
+                   px-5 py-3">
+
+      <!-- 좌측 빈 영역 (48×48) -->
+      <div class="w-12 h-12 shrink-0"></div>
+
+      <!-- 우측 아이콘 버튼 3개 · gap 6px -->
+      <div class="flex items-center gap-1.5">
+
+        <!-- ① 바코드 / QR 스캔 (ico/header/barcode) -->
+        <button class="icon-btn w-12 h-12 flex items-center justify-center rounded-full"
+                style="background: rgba(255,255,255,0.4);"
+                aria-label="바코드 스캔">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <!-- 코너 L브라켓 4개 -->
+            <path d="M3 8.5V3.5H8"     stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M16 3.5H21V8.5"   stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 15.5V20.5H16" stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 20.5H3V15.5"   stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- 중앙 스캔 라인 -->
+            <line x1="5" y1="12" x2="19" y2="12" stroke="#101010" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+        <!-- ② 장바구니 (ico/header/cart) -->
+        <button class="icon-btn w-12 h-12 flex items-center justify-center rounded-full"
+                style="background: rgba(255,255,255,0.4);"
+                aria-label="장바구니">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <!-- 손잡이 아치: x 8→16, top ≈ 4 -->
+            <path d="M8 11V8C8 5.79 9.79 4 12 4C14.21 4 16 5.79 16 8V11"
+                  stroke="#101010" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- 백 바디: x 3→21, y 9→21 -->
+            <rect x="3" y="9" width="18" height="12" rx="2" stroke="#101010" stroke-width="1.5"/>
+          </svg>
+        </button>
+
+        <!-- ③ 햄버거 메뉴 (ico/header/menu) -->
+        <button class="icon-btn w-12 h-12 flex items-center justify-center rounded-full"
+                style="background: rgba(255,255,255,0.4);"
+                aria-label="메뉴">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <!-- y = 7, 13, 19 · x 3→21 · stroke 2 -->
+            <line x1="3" y1="7"  x2="21" y2="7"  stroke="#101010" stroke-width="2" stroke-linecap="round"/>
+            <line x1="3" y1="13" x2="21" y2="13" stroke="#101010" stroke-width="2" stroke-linecap="round"/>
+            <line x1="3" y1="19" x2="21" y2="19" stroke="#101010" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+
+      </div>
+    </header>
+    <!-- ═════════════ END HEADER ═════════════ -->
+
+
+    <!-- ═══════════════════════════════════════════════════
+         GREETING  (Figma node 9109:12497)
+         absolute · left 29.01 · top 116
+         font-size 26 · color #222 · weight Regular (400)
+         letter-spacing -1.56px · line-height 1.25
+         white-space nowrap
+    ═══════════════════════════════════════════════════ -->
+    <p class="absolute"
+       style="
+         left: 29px;
+         top: 116px;
+         font-size: 26px;
+         font-weight: 400;
+         color: #222222;
+         letter-spacing: -1.56px;
+         line-height: 1.25;
+         white-space: nowrap;
+       ">
+      안녕하세요 지훈님,<br>
+      오랜만이에요
+    </p>
+    <!-- ═════════════ END GREETING ═════════════ -->
+
+
+    <!-- ═══════════════════════════════════════════════════
+         CARD SECTION  (Figma node 9109:12498)
+         absolute · left 20 · top 202 · w 335
+         flex-col · gap 10 · items-start
+    ═══════════════════════════════════════════════════ -->
+    <div style="
+      position: absolute;
+      left: 20px;
+      top: 202px;
+      width: 335px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    ">
+
+      <!-- ── 메인 카드 (9109:12499) ──────────────────────
+           Figma bg: radial-gradient(174,174,174 → transparent)
+           + linear rgba(255,255,255,0.4)
+           border: rgba(255,255,255,0.3) · radius 28 · p 28
+      ────────────────────────────────────────────────── -->
+      <div style="
+        position: relative;
+        overflow: hidden;
+        border-radius: 28px;
+        border: 1px solid rgba(255,255,255,0.3);
+        padding: 28px;
+        width: 100%;
+        background:
+          radial-gradient(ellipse 200px 130px at 84% 18%,
+            rgba(174,174,174,0.65) 0%,
+            rgba(209,209,209,0)    70%),
+          rgba(255,255,255,0.4);
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+      ">
+
+        <!-- iPhone 이미지 (absolute, 카드 우측)
+             Figma: left 240 · top 26 · w 75 · h 154
+             mask: 148×148, position -35 -26 (타원형 크롭)
+             img: w 650.28%, h 178.13%, left -255.91%, top -38.68% -->
+        <div style="
+          position: absolute;
+          left: 240px;
+          top: 26px;
+          width: 75px;
+          height: 154px;
+          -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/0a19975b-30c0-4fac-a1e3-3b497f5bf127');
+                  mask-image: url('https://www.figma.com/api/mcp/asset/0a19975b-30c0-4fac-a1e3-3b497f5bf127');
+          -webkit-mask-size: 148px 148px;
+                  mask-size: 148px 148px;
+          -webkit-mask-position: -35px -26px;
+                  mask-position: -35px -26px;
+          -webkit-mask-repeat: no-repeat;
+                  mask-repeat: no-repeat;
+        ">
+          <img
+            src="https://www.figma.com/api/mcp/asset/4ece9fc8-4fd2-472e-9ea5-fb68330f9d1e"
+            alt="iPhone 20 Pro"
+            style="
+              position: absolute;
+              width: 650.28%;
+              height: 178.13%;
+              left: -255.91%;
+              top: -38.68%;
+              max-width: none;
+            "
+          >
+        </div>
+
+        <!-- 텍스트 + 버튼 (Figma: flex-col gap-20 justify-end) -->
+        <div style="
+          flex: 1 0 0;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          align-items: flex-start;
+          justify-content: flex-end;
+          min-width: 0;
+        ">
+          <!-- 본문 텍스트: 16px Medium #101010 tracking-0.48 lh-1.2 -->
+          <p style="
+            font-size: 16px;
+            font-weight: 500;
+            color: #101010;
+            letter-spacing: -0.48px;
+            line-height: 1.2;
+            white-space: nowrap;
+            margin: 0;
+          ">
+            민선님, 주문하신<br>iPhone20 Pro가 도착했어요
+          </p>
+
+          <!-- CTA 버튼: 14px SemiBold #121212 · px-12 py-8 · rounded-full -->
+          <button style="
+            background: rgba(255,255,255,0.5);
+            border: none;
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            color: #121212;
+            letter-spacing: -0.56px;
+            line-height: 1.3;
+            white-space: nowrap;
+            cursor: pointer;
+          ">
+            1분 셀프 개통하기
+          </button>
+        </div>
+
+      </div><!-- ── END 메인 카드 ── -->
+
+
+      <!-- ── 칩 1: 가족 결합 현황 (9109:12508) ─────────────
+           bg rgba(255,255,255,0.4) · rounded-full
+           pl-18 pr-20 py-12 · gap-4
+           icon 20×20 + text 14px Medium #101010 tracking-0.42
+      ─────────────────────────────────────────────────── -->
+      <div style="
+        background: rgba(255,255,255,0.4);
+        border-radius: 999px;
+        padding: 12px 20px 12px 18px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        overflow: hidden;
+      ">
+        <img
+          src="./assets_icon/family.png"
+          alt="" aria-hidden="true"
+          style="width: 20px; height: 20px; flex-shrink: 0; display: block; object-fit: contain;"
+        >
+        <span style="
+          font-size: 14px;
+          font-weight: 500;
+          color: #101010;
+          letter-spacing: -0.42px;
+          line-height: 1.2;
+          white-space: nowrap;
+        ">가족 결합 현황 확인해줘</span>
+      </div>
+
+
+      <!-- ── 칩 2: 이번달 요금 (9109:12511) ──────────────── -->
+      <div style="
+        background: rgba(255,255,255,0.4);
+        border-radius: 999px;
+        padding: 12px 20px 12px 18px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        overflow: hidden;
+      ">
+        <img
+          src="./assets_icon/money.png"
+          alt="" aria-hidden="true"
+          style="width: 20px; height: 20px; flex-shrink: 0; display: block; object-fit: contain;"
+        >
+        <span style="
+          font-size: 14px;
+          font-weight: 500;
+          color: #101010;
+          letter-spacing: -0.42px;
+          line-height: 1.2;
+          white-space: nowrap;
+        ">이번달 요금이 많이 나온 이유 알려줘</span>
+      </div>
+
+    </div><!-- ── END CARD SECTION ── -->
+
+
+    <!-- ═══════════════════════════════════════════════════
+         BANNER  (Figma node 9109:12488)
+         absolute · left 20 · top 586 · 335×101
+         bg rgba(255,255,255,0.2) · radius 28
+    ═══════════════════════════════════════════════════ -->
+    <div style="
+      position: absolute; left: 20px; top: 586px;
+      width: 335px; height: 101px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 28px;
+      overflow: hidden;
+    ">
+      <!-- 텍스트: left 28, top 24, flex-col gap 4 -->
+      <div style="position: absolute; left: 28px; top: 24px;
+                  display: flex; flex-direction: column; gap: 4px;">
+        <p style="font-size: 16px; font-weight: 500; color: #101010;
+                  letter-spacing: -0.48px; line-height: 1.2; white-space: nowrap; margin: 0;">
+          어떤 여행에도 어울리는 아이콘
+        </p>
+        <p style="font-size: 12px; font-weight: 500; color: #101010; opacity: 0.7;
+                  letter-spacing: -0.48px; line-height: 1.3; white-space: nowrap; margin: 0;">
+          RIMOWA 수트케이스
+        </p>
+      </div>
+
+      <!-- RIMOWA 이미지
+           Figma: left calc(50%+124.2px) → 291.7px, -translateX(50%) → left ≈268px
+           container 47.409×61.895 · img left -16.67%, width 130.56% -->
+      <div style="position: absolute; left: 268px; top: 23px;
+                  width: 47.409px; height: 61.895px; overflow: hidden;">
+        <img src="https://www.figma.com/api/mcp/asset/2f1b6b15-c027-4faa-97b6-0d4656141f78"
+             alt="RIMOWA 수트케이스"
+             style="position: absolute; left: -16.67%; top: 0;
+                    width: 130.56%; height: 100%; max-width: none; display: block;">
+      </div>
+
+      <!-- 페이지 인디케이터 도트: left 28, top 73, gap 4 -->
+      <div style="position: absolute; left: 28px; top: 73px;
+                  display: flex; align-items: center; gap: 4px;">
+        <div style="width:4px; height:4px; border-radius:50%; background:#101010;"></div>
+        <div style="width:4px; height:4px; border-radius:50%; background:rgba(16,16,16,0.2);"></div>
+        <div style="width:4px; height:4px; border-radius:50%; background:rgba(16,16,16,0.2);"></div>
+        <div style="width:4px; height:4px; border-radius:50%; background:rgba(16,16,16,0.2);"></div>
+      </div>
+    </div>
+    <!-- ══════════════ END BANNER ══════════════ -->
+
+
+    <!-- ═══════════════════════════════════════════════════
+         TAB LIST / 메뉴  (Figma node 9109:12819)
+         absolute · left 19 · top 736 · w 356
+         flex-col · gap 5.725px · 2줄 × 4탭
+    ═══════════════════════════════════════════════════ -->
+    <div style="
+      position: absolute; left: 19px; top: 718px;
+      width: 356px; overflow: hidden;
+      display: flex; flex-direction: column; gap: 5.725px;
+    ">
+
+      <!-- ── Row 1: Galaxy S29 · 휴대폰 · 모바일 요금제 · 구독 ── -->
+      <div style="display: flex; gap: 5.725px; align-items: center;">
+
+        <!-- ① Galaxy S29 (활성 탭 — 다크 그라디언트 배경) -->
+        <div class="tab-pill">
+          <div style="
+            width: 30.534px; height: 30.534px; border-radius: 953px; flex-shrink: 0;
+            background: linear-gradient(165deg, rgba(92,92,92,0.8) 52.9%, rgb(64,64,64) 121.9%);
+            box-shadow: 0 0 11.45px rgba(0,0,0,0.04);
+          "></div>
+          <span class="tab-label">Galaxy S29</span>
+        </div>
+
+        <!-- ② 휴대폰 -->
+        <div class="tab-pill">
+          <div class="tab-icon-circle"></div>
+          <span class="tab-label">휴대폰</span>
+        </div>
+
+        <!-- ③ 모바일 요금제 -->
+        <div class="tab-pill">
+          <div class="tab-icon-circle">
+            <!-- ico/solid/data: 3개 오름차순 막대 (CSS 재현)
+                 19.084px 아이콘이 30.534px 원 중앙에 → offset 5.725px -->
+            <svg width="19.084" height="19.084" viewBox="0 0 19.084 19.084"
+                 style="position:absolute; left:5.725px; top:5.725px; display:block;">
+              <rect x="4.1"   y="9.1"  width="2.863" height="5.725"  rx="1.4" fill="#010101"/>
+              <rect x="7.74"  y="6.37" width="2.863" height="8.588"  rx="1.4" fill="#010101"/>
+              <rect x="11.38" y="3.64" width="2.863" height="11.45"  rx="1.4" fill="#010101"/>
+            </svg>
+          </div>
+          <span class="tab-label">모바일 요금제</span>
+        </div>
+
+        <!-- ④ 구독 (row 1) -->
+        <div class="tab-pill">
+          <div class="tab-icon-circle">
+            <svg width="19.084" height="19.084" viewBox="0 0 19.084 19.084"
+                 style="position:absolute; left:5.725px; top:5.725px; display:block;">
+              <rect x="4.1"   y="9.1"  width="2.863" height="5.725"  rx="1.4" fill="#010101"/>
+              <rect x="7.74"  y="6.37" width="2.863" height="8.588"  rx="1.4" fill="#010101"/>
+              <rect x="11.38" y="3.64" width="2.863" height="11.45"  rx="1.4" fill="#010101"/>
+            </svg>
+          </div>
+          <span class="tab-label">구독</span>
+        </div>
+
+      </div><!-- ── END Row 1 ── -->
+
+
+      <!-- ── Row 2: 결합상품 · 구독 · 부가서비스 · 액세서리 ── -->
+      <div style="display: flex; gap: 5.725px; align-items: center;">
+
+        <!-- ⑤ 결합상품 -->
+        <div class="tab-pill">
+          <div class="tab-icon-circle">
+            <!-- ico/solid/combination: Union3 · 15.267×8.588px centered -->
+            <img src="https://www.figma.com/api/mcp/asset/c606f031-b1d9-40c3-9a5e-ed71983c336c" alt=""
+                 style="position:absolute; left:50%; top:50%; width:15.267px; height:8.588px;
+                        transform:translate(-50%,-50%); object-fit:contain; display:block;">
+          </div>
+          <span class="tab-label">결합상품</span>
+        </div>
+
+        <!-- ⑥ 구독 (row 2) -->
+        <div class="tab-pill">
+          <div class="tab-icon-circle">
+            <!-- ico/solid/subsribe: Union4 · 12.405×13.358px at (3.19, 2.73) in icon -->
+            <!-- icon 19.084px centered in 30.534px → offset 5.725px; icon pos → total offset -->
+            <img src="https://www.figma.com/api/mcp/asset/40933c99-09f8-4c98-bc6e-761ea502d850" alt=""
+                 style="position:absolute; left:calc(5.725px + 3.19px); top:calc(5.725px + 2.73px);
+                        width:12.405px; height:13.358px; object-fit:contain; display:block;">
+          </div>
+          <span class="tab-label">구독</span>
+        </div>
+
+        <!-- ⑦ 부가서비스 -->
+        <div class="tab-pill">
+          <div class="tab-icon-circle">
+            <!-- ico/solid/addition: Subtract1 · 13.359×13.359px at (3.17, 3.17) in icon -->
+            <img src="https://www.figma.com/api/mcp/asset/2a0fc85c-8f06-4e8b-b8bc-fad7be3871d7" alt=""
+                 style="position:absolute; left:calc(5.725px + 3.17px); top:calc(5.725px + 3.17px);
+                        width:13.359px; height:13.359px; object-fit:contain; display:block;">
+          </div>
+          <span class="tab-label">부가서비스</span>
+        </div>
+
+        <!-- ⑧ 액세서리 -->
+        <div class="tab-pill">
+          <div class="tab-icon-circle">
+            <!-- ico/solid/acc: Union5 · 13.359×13.358px centered (+0.44px offset) -->
+            <img src="https://www.figma.com/api/mcp/asset/a40302c3-db20-4f30-a775-565923b672bf" alt=""
+                 style="position:absolute; left:50%; top:50%; width:13.359px; height:13.358px;
+                        transform:translate(calc(-50% + 0.44px), calc(-50% + 0.44px));
+                        object-fit:contain; display:block;">
+          </div>
+          <span class="tab-label">액세서리</span>
+        </div>
+
+      </div><!-- ── END Row 2 ── -->
+
+    </div><!-- ══════════════ END TAB LIST ══════════════ -->
+
+
+    <!-- ═══════════════════════════════════════════════════
+         ConShopping  (Figma node 9109:12514)
+         absolute · left 19.09 · top 860 · w 336.832 · flex-col gap 7.634
+    ═══════════════════════════════════════════════════ -->
+    <div style="
+      position: absolute; left: 19.09px; top: 860px;
+      width: 336.832px;
+      display: flex; flex-direction: column; gap: 12px; align-items: flex-start;
+    ">
+
+      <!-- ── card 1: 최근 본 아이폰을 혜택으로 만나보세요 (9109:12515) ── -->
+      <div style="
+        width: 100%; flex-shrink: 0;
+        background: rgba(255,255,255,0.9);
+        border-radius: 26.718px; overflow: hidden;
+        display: flex; flex-direction: column; align-items: flex-start;
+      ">
+
+      <!-- ── 배너 이미지 ── -->
+      <div style="
+        height: 164.122px; width: 100%; flex-shrink: 0;
+        overflow: hidden; border-radius: 19.084px; position: relative;
+      ">
+        <img src="https://www.figma.com/api/mcp/asset/2302c7a5-6ae1-4003-8fda-a1526abe4897" alt=""
+             style="position: absolute; inset: 0; width: 100%; height: 100%;
+                    object-fit: cover; max-width: none; display: block; pointer-events: none;">
+      </div>
+
+      <!-- ── 타이틀 영역 ── -->
+      <div style="
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 19.084px 26.718px; width: 100%; flex-shrink: 0; box-sizing: border-box;
+      ">
+        <div style="display: flex; flex-direction: column; gap: 3.817px; align-items: flex-start;">
+          <!-- 메인 타이틀 -->
+          <div style="
+            font-size: 17.176px; font-weight: 500; color: #101010;
+            line-height: 1.3; letter-spacing: -0.5153px;
+          ">
+            <p style="margin: 0;">최근 본 아이폰을</p>
+            <p style="margin: 0;">혜택으로 만나보세요</p>
+          </div>
+          <!-- 서브 텍스트 + 화살표 -->
+          <div style="display: flex; gap: 1.908px; align-items: center; opacity: 0.6;">
+            <span style="
+              font-size: 11.45px; font-weight: 500; color: #101010;
+              line-height: 1.3; letter-spacing: -0.458px; white-space: nowrap;
+            ">단말기 추천</span>
+            <!-- chevron-right (11.45px 컨테이너, 아이콘 -90deg 회전) -->
+            <div style="width: 11.45px; height: 11.45px; flex-shrink: 0; position: relative; overflow: hidden;">
+              <img src="https://www.figma.com/api/mcp/asset/e2ee6574-1362-47c7-9fef-c3edd3fe03a3" alt=""
+                   style="position: absolute; left: 50%; top: 50%;
+                          transform: translate(calc(-50% + 0.48px), -50%) rotate(-90deg);
+                          width: 4.771px; height: 2.863px; display: block; max-width: none;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 상품 목록 (가로 3개, 카드 너비 초과 → clip) ── -->
+      <div style="
+        padding: 0 0 28.626px 26.718px;
+        display: flex; gap: 7.634px; align-items: flex-start; flex-shrink: 0;
+      ">
+
+        <!-- 상품 1 -->
+        <a id="touch-hint-area" href="./scenario3-2.html" style="display: flex; flex-direction: column; gap: 11.45px; align-items: flex-start; flex-shrink: 0; text-decoration: none; cursor: pointer; position: relative;">
+          <!-- Touch guide overlay -->
+          <div id="thumb-highlight" style="position:absolute; inset:-6px; border-radius:18px; border:3px solid rgba(89,64,223,0.85); background:rgba(89,64,223,0.06); pointer-events:none; opacity:0; z-index:5;"></div>
+          <div style="
+            width: 122.137px; height: 122.137px;
+            background: #f4f5fa; border-radius: 15.267px;
+            overflow: hidden; flex-shrink: 0; position: relative;
+          ">
+            <img src="https://www.figma.com/api/mcp/asset/88e20b07-ff53-4c11-b063-9eaa66e14230" alt=""
+                 style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+                        object-fit: contain; display: block; max-width: none;">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5.725px; align-items: flex-start; padding: 0 3.817px;">
+            <p style="
+              font-size: 13.359px; font-weight: 500; color: #101010;
+              line-height: 1.2; letter-spacing: -0.5344px; margin: 0;
+            ">iPhone 20 Air</p>
+            <div style="display: flex; gap: 1.908px; align-items: center; flex-shrink: 0;">
+              <span style="
+                font-size: 13.359px; font-weight: 700; color: #3617ce;
+                line-height: 1.2; letter-spacing: -0.5344px; white-space: nowrap;
+              ">7%</span>
+              <span style="
+                font-size: 13.359px; font-weight: 700; color: #101010;
+                line-height: 1.2; letter-spacing: -0.5344px; white-space: nowrap;
+              ">1,165,600원</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- 상품 2 -->
+        <div style="display: flex; flex-direction: column; gap: 11.45px; align-items: flex-start; flex-shrink: 0;">
+          <div style="
+            width: 122.137px; height: 122.137px;
+            background: #f4f5fa; border-radius: 15.267px;
+            overflow: hidden; flex-shrink: 0; position: relative;
+          ">
+            <img src="https://www.figma.com/api/mcp/asset/88e20b07-ff53-4c11-b063-9eaa66e14230" alt=""
+                 style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+                        object-fit: contain; display: block; max-width: none;">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5.725px; align-items: flex-start; padding: 0 3.817px;">
+            <p style="
+              font-size: 13.359px; font-weight: 500; color: #101010;
+              line-height: 1.2; letter-spacing: -0.5344px; margin: 0;
+            ">iPhone 20 Air</p>
+            <div style="display: flex; gap: 1.908px; align-items: center; flex-shrink: 0;">
+              <span style="
+                font-size: 13.359px; font-weight: 700; color: #3617ce;
+                line-height: 1.2; letter-spacing: -0.5344px; white-space: nowrap;
+              ">7%</span>
+              <span style="
+                font-size: 13.359px; font-weight: 700; color: #101010;
+                line-height: 1.2; letter-spacing: -0.5344px; white-space: nowrap;
+              ">1,165,600원</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 상품 3 (카드 우측에 살짝 잘림) -->
+        <div style="display: flex; flex-direction: column; gap: 11.45px; align-items: flex-start; flex-shrink: 0;">
+          <div style="
+            width: 122.137px; height: 122.137px;
+            background: #f4f5fa; border-radius: 15.267px;
+            overflow: hidden; flex-shrink: 0; position: relative;
+          ">
+            <img src="https://www.figma.com/api/mcp/asset/88e20b07-ff53-4c11-b063-9eaa66e14230" alt=""
+                 style="position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+                        object-fit: contain; display: block; max-width: none;">
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 5.725px; align-items: flex-start; padding: 0 3.817px;">
+            <p style="
+              font-size: 13.359px; font-weight: 500; color: #101010;
+              line-height: 1.2; letter-spacing: -0.5344px; margin: 0;
+            ">iPhone 20 Air</p>
+            <div style="display: flex; gap: 1.908px; align-items: center; flex-shrink: 0;">
+              <span style="
+                font-size: 13.359px; font-weight: 700; color: #3617ce;
+                line-height: 1.2; letter-spacing: -0.5344px; white-space: nowrap;
+              ">7%</span>
+              <span style="
+                font-size: 13.359px; font-weight: 700; color: #101010;
+                line-height: 1.2; letter-spacing: -0.5344px; white-space: nowrap;
+              ">1,165,600원</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- ── END 상품 목록 ── -->
+
+      </div><!-- ── END card 1 ── -->
+
+
+      <!-- ── iPhone 20 사전예약 배너 (9109:12585) ── -->
+      <div style="
+        width: 100%; flex-shrink: 0;
+        background: rgba(255,255,255,0.9);
+        border: 0.954px solid white;
+        border-radius: 26.718px;
+        overflow: hidden; position: relative;
+        height: 106.87px;
+      ">
+        <!-- 에어팟 이미지 (우측) · ImageArea left 233.78 top 15.27 size 76.336 -->
+        <div style="position: absolute; left: 233.78px; top: 15.27px; width: 76.336px; height: 76.336px; overflow: hidden;">
+          <img src="https://www.figma.com/api/mcp/asset/f3d54642-8288-49dc-9fc2-112c39ff850f" alt="에어팟 프로"
+               style="position: absolute; height: 72.73%; left: 13.16%; top: 13.64%; width: 73.69%;
+                      max-width: none; display: block; object-fit: contain;">
+        </div>
+        <!-- 텍스트 (좌측, 이미지 위 오버레이) · px 26.718 py 24.809 -->
+        <div style="
+          position: absolute; left: 0; top: 0; height: 100%;
+          display: flex; flex-direction: column; gap: 1.908px; justify-content: center;
+          padding: 24.809px 26.718px;
+        ">
+          <div style="
+            font-size: 15.267px; font-weight: 700; color: #101010;
+            line-height: 1.3; letter-spacing: -0.6107px; opacity: 0.8;
+          ">
+            <p style="margin: 0; white-space: nowrap;">iPhone 20 사전 예약 시</p>
+            <p style="margin: 0; white-space: nowrap;">에어팟 프로 증정</p>
+          </div>
+          <p style="
+            font-size: 11.45px; font-weight: 500; color: #101010;
+            line-height: 1.3; letter-spacing: -0.458px; opacity: 0.4;
+            margin: 0; white-space: nowrap;
+          ">사전예약 클럽 멤버십 혜택</p>
+        </div>
+      </div><!-- ── END iPhone 20 사전예약 배너 ── -->
+
+
+      <!-- ── card 2: 약정 만료 시 위약금 없이 이어갈 수 있는 요금제에요 (9109:12590) ── -->
+      <div style="
+        width: 100%; flex-shrink: 0;
+        background: rgba(255,255,255,0.9);
+        border-radius: 26.718px; overflow: hidden;
+        display: flex; flex-direction: column; align-items: flex-start;
+      ">
+
+        <!-- 상단 배너 이미지 · h 164.167px -->
+        <div style="height: 164.167px; width: 100%; flex-shrink: 0; position: relative;">
+          <img src="https://www.figma.com/api/mcp/asset/9f170e27-7a5b-48dc-ac17-c8976e726abb" alt=""
+               style="position: absolute; inset: 0; width: 100%; height: 100%;
+                      object-fit: cover; max-width: none; display: block; pointer-events: none;">
+        </div>
+
+        <!-- 타이틀 영역 · px 26.718 -->
+        <div style="
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 19.084px 26.718px; width: 100%; flex-shrink: 0; box-sizing: border-box;
+        ">
+          <div style="display: flex; flex-direction: column; gap: 3.817px; align-items: flex-start;">
+            <div style="
+              font-size: 17.176px; font-weight: 500; color: #101010;
+              line-height: 1.3; letter-spacing: -0.5153px;
+            ">
+              <p style="margin: 0;">약정 만료 시 위약금 없이</p>
+              <p style="margin: 0;">이어갈 수 있는 요금제에요</p>
+            </div>
+            <div style="display: flex; gap: 1.908px; align-items: center; opacity: 0.6;">
+              <span style="
+                font-size: 11.45px; font-weight: 500; color: #101010;
+                line-height: 1.3; letter-spacing: -0.458px; white-space: nowrap;
+              ">전체 요금제</span>
+              <div style="width: 11.45px; height: 11.45px; flex-shrink: 0; position: relative; overflow: hidden;">
+                <img src="https://www.figma.com/api/mcp/asset/e2ee6574-1362-47c7-9fef-c3edd3fe03a3" alt=""
+                     style="position: absolute; left: 50%; top: 50%;
+                            transform: translate(calc(-50% + 0.48px), -50%) rotate(-90deg);
+                            width: 4.771px; height: 2.863px; display: block; max-width: none;">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 요금제 목록 · px 26.718 pt 0 pb 28.626 · gap 15.267 -->
+        <div style="
+          padding: 0 26.718px 28.626px; width: 100%; flex-shrink: 0; box-sizing: border-box;
+          display: flex; flex-direction: column; gap: 15.267px;
+        ">
+
+          <!-- 항목 1: 0 청년 109(넷플릭스) -->
+          <div style="display: flex; gap: 15.267px; align-items: flex-start; width: 100%;">
+            <!-- 플랜 로고 아이콘 · 45.8×45.8px -->
+            <div style="width: 45.8px; height: 45.8px; flex-shrink: 0; position: relative;">
+              <img src="https://www.figma.com/api/mcp/asset/2feb4d1d-f1ef-443a-82a6-0974dbec03dc" alt=""
+                   style="position: absolute; inset: 0; width: 100%; height: 100%;
+                          object-fit: cover; max-width: none; display: block; pointer-events: none;">
+            </div>
+            <!-- 텍스트 -->
+            <div style="flex: 1 0 0; display: flex; flex-direction: column; gap: 3.817px; align-items: flex-start; min-width: 0;">
+              <p style="
+                font-size: 13.359px; font-weight: 500; color: #101010;
+                line-height: 1.2; letter-spacing: -0.5344px; margin: 0;
+              ">0 청년 109(넷플릭스)</p>
+              <p style="
+                font-size: 13.359px; font-weight: 700; color: #101010;
+                line-height: 1.2; letter-spacing: -0.5344px; margin: 0; white-space: nowrap;
+              ">월 99,000원</p>
+              <div style="display: flex; gap: 3.817px; align-items: center; opacity: 0.4;">
+                <span style="font-size: 11.45px; font-weight: 400; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">데이터 500GB</span>
+                <div style="width: 0.954px; height: 7.634px; background: #d9d9d9; flex-shrink: 0;"></div>
+                <span style="font-size: 11.45px; font-weight: 400; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">넷플릭스 프리미엄 제공</span>
+                <span style="font-size: 11.45px; font-weight: 400; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">+2</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 항목 2: 0 청년 109(네이버 플러스 스토어) -->
+          <div style="display: flex; gap: 15.267px; align-items: flex-start; width: 100%;">
+            <div style="width: 45.8px; height: 45.8px; flex-shrink: 0; position: relative;">
+              <img src="https://www.figma.com/api/mcp/asset/bfafd02e-4ca5-4e15-a09f-d3ff96542c86" alt=""
+                   style="position: absolute; inset: 0; width: 100%; height: 100%;
+                          object-fit: cover; max-width: none; display: block; pointer-events: none;">
+            </div>
+            <div style="flex: 1 0 0; display: flex; flex-direction: column; gap: 3.817px; align-items: flex-start; min-width: 0;">
+              <p style="
+                font-size: 13.359px; font-weight: 500; color: #101010;
+                line-height: 1.2; letter-spacing: -0.5344px; margin: 0;
+              ">0 청년 109(네이버 플러스 스토어)</p>
+              <p style="
+                font-size: 13.359px; font-weight: 700; color: #101010;
+                line-height: 1.2; letter-spacing: -0.5344px; margin: 0; white-space: nowrap;
+              ">월 99,000원</p>
+              <div style="display: flex; gap: 3.817px; align-items: center; opacity: 0.4;">
+                <span style="font-size: 11.45px; font-weight: 400; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">데이터 500GB</span>
+                <div style="width: 0.954px; height: 7.634px; background: #d9d9d9; flex-shrink: 0;"></div>
+                <span style="font-size: 11.45px; font-weight: 400; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">넷플릭스 프리미엄 제공</span>
+                <span style="font-size: 11.45px; font-weight: 400; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">+2</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- END 요금제 목록 -->
+
+      </div><!-- ── END card 2 ── -->
+
+
+      <!-- ── card 3: 일상 생활 속 데이터 얼마나 필요하세요? (9109:12638) ── -->
+      <!-- 배너 이미지 없음 · px 26.718 py 28.626 · 내부 gap 28.626 -->
+      <div style="
+        width: 100%; flex-shrink: 0;
+        background: rgba(255,255,255,0.9);
+        border-radius: 26.718px;
+        padding: 28.626px 26.718px;
+        box-sizing: border-box;
+        display: flex; flex-direction: column; gap: 28.626px; align-items: flex-start;
+      ">
+
+        <!-- 타이틀 -->
+        <div style="display: flex; flex-direction: column; gap: 3.817px; align-items: flex-start;">
+          <div style="
+            font-size: 17.176px; font-weight: 500; color: #101010;
+            line-height: 1.3; letter-spacing: -0.5153px;
+          ">
+            <p style="margin: 0;">일상 생활 속 데이터</p>
+            <p style="margin: 0;">얼마나 필요하세요?</p>
+          </div>
+          <p style="
+            font-size: 11.45px; font-weight: 500; color: #101010;
+            line-height: 1.3; letter-spacing: -0.458px; opacity: 0.6; margin: 0;
+          ">SKT 고객을 위한 요금제</p>
+        </div>
+
+        <!-- 데이터 사용량 항목 · flex-col gap 15.267 -->
+        <div style="display: flex; flex-direction: column; gap: 15.267px; width: 100%;">
+
+          <!-- ① 무제한 (그래프 막대 아이콘) -->
+          <div style="display: flex; gap: 15.267px; align-items: center; width: 100%;">
+            <div style="width: 45.802px; height: 45.802px; background: #f1f1f1; border-radius: 7.634px; flex-shrink: 0; position: relative;">
+              <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 27.481px; height: 27.481px;">
+                <div style="position: absolute; left: 1.96px; top: 0.98px; width: 25.026px; height: 25.518px;">
+                  <img src="https://www.figma.com/api/mcp/asset/c47a3d34-0aa5-45ca-be64-dd2dcc0f6f2b" alt=""
+                       style="position: absolute; top: 0; left: 0; width: 114.24%; height: 113.96%; display: block; max-width: none;">
+                </div>
+              </div>
+            </div>
+            <div style="flex: 1 0 0; display: flex; flex-direction: column; gap: 3.817px; min-width: 0;">
+              <p style="font-size: 13.359px; font-weight: 500; color: #101010; line-height: 1.2; letter-spacing: -0.5344px; margin: 0;">데이터 걱정 없이 마음껏 사용해요</p>
+              <div style="display: flex; gap: 3.817px; align-items: center; opacity: 0.4;">
+                <span style="font-size: 11.45px; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">무제한</span>
+                <div style="width: 0.954px; height: 7.634px; background: #d9d9d9; flex-shrink: 0;"></div>
+                <span style="font-size: 11.45px; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">69,000원 부터</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ② 50~100GB (카드 스왑 아이콘) -->
+          <div style="display: flex; gap: 15.267px; align-items: center; width: 100%;">
+            <div style="width: 45.802px; height: 45.802px; background: #f1f1f1; border-radius: 7.634px; flex-shrink: 0; position: relative;">
+              <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 27.481px; height: 27.481px;">
+                <div style="position: absolute; background: #c7c7c7; height: 14.722px; left: 0.98px; border-radius: 4px; top: 3.93px; width: 20.611px;"></div>
+                <div style="position: absolute; background: #121212; height: 14.722px; left: 5.88px; border-radius: 4px; top: 8.83px; width: 20.611px; box-shadow: 0.624px 0.624px 2.872px rgba(21,15,51,0.2);"></div>
+                <div style="position: absolute; left: 13.74px; top: 12.76px; width: 5.889px; height: 6.87px; transform: rotate(90deg);">
+                  <img src="https://www.figma.com/api/mcp/asset/8db37bc3-0aff-4891-b587-a3f2d8109de8" alt=""
+                       style="position: absolute; top: 8.21%; left: 5.28%; width: 89.44%; height: 91.79%; display: block; max-width: none; object-fit: contain;">
+                </div>
+              </div>
+            </div>
+            <div style="flex: 1 0 0; display: flex; flex-direction: column; gap: 3.817px; min-width: 0;">
+              <p style="font-size: 13.359px; font-weight: 500; color: #101010; line-height: 1.2; letter-spacing: -0.5344px; margin: 0;">영상도 보고 여유 있게 사용해요</p>
+              <div style="display: flex; gap: 3.817px; align-items: center; opacity: 0.4;">
+                <span style="font-size: 11.45px; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">50~100GB</span>
+                <div style="width: 0.954px; height: 7.634px; background: #d9d9d9; flex-shrink: 0;"></div>
+                <span style="font-size: 11.45px; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">48,000원 부터</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ③ 5~10GB (채팅 아이콘) -->
+          <div style="display: flex; gap: 15.267px; align-items: center; width: 100%;">
+            <div style="width: 45.802px; height: 45.802px; background: #f1f1f1; border-radius: 7.634px; flex-shrink: 0; position: relative;">
+              <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 27.481px; height: 27.481px;">
+                <div style="position: absolute; left: 1.93px; top: 2.89px; width: 17.666px; height: 17.666px; transform: rotate(180deg) scaleY(-1);">
+                  <img src="https://www.figma.com/api/mcp/asset/1367f6ee-79c6-4b47-8e68-6f2caeeb5135" alt=""
+                       style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; max-width: none; object-fit: contain;">
+                </div>
+                <div style="position: absolute; left: 7.71px; top: 5.78px; width: 17.666px; height: 17.666px; overflow: visible;">
+                  <img src="https://www.figma.com/api/mcp/asset/e74b37e2-3708-4afc-888b-1a4a9365286b" alt=""
+                       style="position: absolute; inset: -12.96% -20.16%; width: 140.32%; height: 125.92%; display: block; max-width: none; object-fit: contain;">
+                </div>
+                <div style="position: absolute; left: 12.27px; top: 13.74px; width: 8.833px; height: 1.963px;">
+                  <img src="https://www.figma.com/api/mcp/asset/fa3d675d-a01b-4950-a949-80ca2517d8c1" alt=""
+                       style="position: absolute; inset: 0; width: 100%; height: 100%; display: block; max-width: none; object-fit: contain;">
+                </div>
+              </div>
+            </div>
+            <div style="flex: 1 0 0; display: flex; flex-direction: column; gap: 3.817px; min-width: 0;">
+              <p style="font-size: 13.359px; font-weight: 500; color: #101010; line-height: 1.2; letter-spacing: -0.5344px; margin: 0;">메신저 위주로 가볍게 사용해요</p>
+              <div style="display: flex; gap: 3.817px; align-items: center; opacity: 0.4;">
+                <span style="font-size: 11.45px; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">5~10GB</span>
+                <div style="width: 0.954px; height: 7.634px; background: #d9d9d9; flex-shrink: 0;"></div>
+                <span style="font-size: 11.45px; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">34,000원 부터</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ④ 직접 찾기 (리스트+검색 아이콘) -->
+          <div style="display: flex; gap: 15.267px; align-items: center; width: 100%;">
+            <div style="width: 45.802px; height: 45.802px; background: #f1f1f1; border-radius: 7.634px; flex-shrink: 0; position: relative;">
+              <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 27.481px; height: 27.481px;">
+                <div style="position: absolute; background: #c7c7c7; height: 3.926px; left: 1.96px; border-radius: 4px; top: 1.96px; width: 19.629px;"></div>
+                <div style="position: absolute; background: #c7c7c7; height: 3.926px; left: 1.96px; border-radius: 4px; top: 8.83px; width: 19.629px;"></div>
+                <div style="position: absolute; background: #c7c7c7; height: 3.926px; left: 1.96px; border-radius: 4px; top: 15.7px; width: 10.796px;"></div>
+                <div style="position: absolute; left: 9.81px; top: 9.82px; width: 17.666px; height: 17.664px; overflow: visible;">
+                  <img src="https://www.figma.com/api/mcp/asset/0bfe2273-0265-424b-88f6-f90ae0c45058" alt=""
+                       style="position: absolute; inset: -12.96% -20.16%; width: 140.32%; height: 125.92%; display: block; max-width: none; object-fit: contain;">
+                </div>
+              </div>
+            </div>
+            <div style="flex: 1 0 0; display: flex; flex-direction: column; gap: 3.817px; min-width: 0;">
+              <p style="font-size: 13.359px; font-weight: 500; color: #101010; line-height: 1.2; letter-spacing: -0.5344px; margin: 0;">원하는 요금제를 직접 찾아볼게요</p>
+              <div style="display: flex; align-items: center; opacity: 0.4;">
+                <span style="font-size: 11.45px; color: #101010; line-height: 1.2; letter-spacing: -0.458px; white-space: nowrap;">19,000원 부터</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- END 데이터 항목 -->
+
+      </div><!-- ── END card 3 ── -->
+
+
+    </div><!-- ══════════════ END ConShopping ══════════════ -->
+
+
+    <!-- 프레임 높이 확보 (card 3 하단 + GNB 여백) -->
+    <div style="height: 2390px;"></div>
+
+  </div><!-- /.app-scroll -->
+
+
+  <!-- ═══════════════════════════════════════════════════
+       GNB  (Figma node 9109:12450)
+       항상 하단 고정 · flex-shrink 0
+       375×57.252px · T-홈 버튼 + 혜택/쇼핑/마이 탭
+  ═══════════════════════════════════════════════════ -->
+  <div class="app-gnb">
+
+    <!-- 그라디언트 페이드 (콘텐츠와 GNB 경계) · h 56px -->
+    <div style="
+      width: 100%; height: 56px; pointer-events: none;
+      background: linear-gradient(to bottom, rgba(210,212,217,0) 0%, #d2d4d9 100%);
+    "></div>
+
+    <!-- GNB 바 · h 57.252px · bg #d2d4d9 -->
+    <div class="gnb-bar" style="width: 100%; height: 57.252px; background: #d2d4d9; position: relative;">
+
+      <!-- T-홈 버튼 · left 19.08px · top 3.82px · 49.618×49.618px -->
+      <div style="
+        position: absolute; left: 19.08px; top: 3.82px;
+        width: 49.618px; height: 49.618px;
+        background: rgba(255,255,255,0.5);
+        border-radius: 24.809px;
+        box-shadow: 0 0 19.084px rgba(0,0,0,0.05);
+        overflow: hidden;
+        display: flex; align-items: center; justify-content: center;
+      ">
+        <img src="./assets_icon/ico/gnb/t-home.png" alt="T 홈"
+             style="width: 55%; height: 55%; object-fit: contain; display: block;">
+      </div>
+
+      <!-- 탭 pill 배경 · left 76.34px · 279.58×57.252px -->
+      <div style="
+        position: absolute; left: 76.34px; top: 0;
+        width: 279.58px; height: 57.252px;
+        background: rgba(255,255,255,0.5);
+        border-radius: 953.244px;
+        box-shadow: 0 0 19.084px rgba(0,0,0,0.05);
+      "></div>
+
+      <!-- 탭 pill 컨테이너 (overflow clip) -->
+      <div style="
+        position: absolute; left: 76.34px; top: 0;
+        width: 279.58px; height: 57.252px;
+        border-radius: 953.244px; overflow: hidden;
+      ">
+        <!-- 활성 탭 인디케이터 (쇼핑 탭 중앙) · 89.695×49.618px -->
+        <div style="
+          position: absolute;
+          width: 89.695px; height: 49.618px;
+          left: calc(50% + 0.48px - 44.847px);
+          top: calc(50% - 24.809px);
+          background: rgba(214,214,214,0.8);
+          border-radius: 47.71px;
+        "></div>
+
+        <!-- 탭 1: 혜택 (비활성) -->
+        <div style="position: absolute; left: 3.82px; top: 50%; transform: translateY(-50%); width: 89.695px; height: 49.618px;">
+          <img src="./assets_icon/Tab content container.png" alt="혜택"
+               style="width: 100%; height: 100%; object-fit: contain; display: block;">
+        </div>
+
+        <!-- 탭 2: 쇼핑 (활성 — 중앙) -->
+        <div style="position: absolute; left: calc(50% + 0.48px); top: 50%; transform: translate(-50%, -50%); width: 89.695px; height: 49.618px;">
+          <img src="./assets_icon/Tab content container-1.png" alt="쇼핑"
+               style="width: 100%; height: 100%; object-fit: contain; display: block;">
+        </div>
+
+        <!-- 탭 3: 마이 (비활성) -->
+        <div style="position: absolute; left: 185.12px; top: 50%; transform: translateY(-50%); width: 89.695px; height: 49.618px;">
+          <img src="./assets_icon/Tab content container-2.png" alt="마이"
+               style="width: 100%; height: 100%; object-fit: contain; display: block;">
+        </div>
+
+      </div><!-- END 탭 pill 컨테이너 -->
+
+    </div><!-- END GNB 바 -->
+
+    <!-- 하단 여백 -->
+    <div style="width: 100%; height: 16px; background: #d2d4d9;"></div>
+
+  </div><!-- ══════════════ END GNB ══════════════ -->
+
+
+  <!-- ── 스크롤 안내 힌트 ── -->
+  <div id="scroll-hint">
+    <span style="font-size:16px; font-weight:600; color:white; letter-spacing:-0.4px; line-height:1.3;">아래로 스크롤해보세요</span>
+    <svg width="17" height="17" viewBox="0 0 14 14" fill="none">
+      <path d="M7 2V12M7 12L3 8M7 12L11 8" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  </div><!-- /#app -->
+
+<script>
+  // 모바일: 375px 레이아웃을 뷰포트에 맞게 scale
+  function fitMobile() {
+    if (window.innerWidth >= 768) return;
+    var scale = window.innerWidth / 375;
+    var app = document.getElementById('app');
+    app.style.position = 'fixed';
+    app.style.top = '0';
+    app.style.left = '0';
+    app.style.width = '375px';
+    app.style.height = (window.innerHeight / scale) + 'px';
+    app.style.transform = 'scale(' + scale + ')';
+    app.style.transformOrigin = 'top left';
+  }
+  fitMobile();
+  window.addEventListener('resize', fitMobile);
+
+  var scroll = document.querySelector('.app-scroll');
+
+  // 상품 1 클릭 → 즉시 이동 (출발 페이지 slide-out 없음, 도착 페이지가 위로 덮어 들어옴)
+  document.querySelector('a[href="./scenario3-2.html"]').addEventListener('click', function(e) {
+    e.preventDefault();
+    window.location.href = this.href;
+  });
+
+  // Touch area guide
+  function showGuide(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('active');
+    void el.offsetWidth;
+    el.classList.add('active');
+    el.addEventListener('animationend', function() { el.classList.remove('active'); }, { once: true });
+  }
+
+  function isCardVisible() {
+    var hintArea = document.getElementById('touch-hint-area');
+    var container = document.querySelector('.app-scroll');
+    if (!hintArea || !container) return true;
+    var elRect = hintArea.getBoundingClientRect();
+    var contRect = container.getBoundingClientRect();
+    return elRect.top < contRect.bottom && elRect.bottom > contRect.top;
+  }
+
+  document.addEventListener('click', function(e) {
+    var hintArea = document.getElementById('touch-hint-area');
+    if (!hintArea || hintArea.contains(e.target)) return;
+    if (!isCardVisible()) {
+      showGuide('scroll-hint');
+    } else {
+      showGuide('thumb-highlight');
+    }
+  }, false);
+
+  // 뒤로 돌아왔을 때 → 콘텐츠 slide in from left
+  if (sessionStorage.getItem('s3_back') === '1') {
+    sessionStorage.removeItem('s3_back');
+    scroll.style.animation = 'slideInFromLeft 0.28s cubic-bezier(0.4,0,0.2,1) forwards';
+  }
+</script>
+</body>
+</html>

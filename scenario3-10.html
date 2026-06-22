@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>주문 확인 — SKT ConShopping</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body { font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif; }
+
+    /* ── 데스크탑: 폰 프레임 ── */
+    @media (min-width: 768px) {
+      body {
+        background: #a8aab4;
+        display: flex; align-items: center; justify-content: center;
+        min-height: 100dvh;
+      }
+      #app {
+        position: relative;
+        width: 375px; height: 812px;
+        overflow: hidden;
+        border-radius: 32px;
+        box-shadow: 0 40px 100px rgba(0,0,0,0.22), 0 0 0 1px rgba(0,0,0,0.06);
+        flex-shrink: 0;
+      }
+      .app-scroll {
+        position: absolute; inset: 0;
+        overflow-y: auto; overflow-x: hidden;
+        scrollbar-width: none;
+      }
+      .app-scroll::-webkit-scrollbar { display: none; }
+      .bottom-bar { position: absolute; }
+    }
+    /* ── 모바일 ── */
+    @media (max-width: 767px) {
+      body { background: #f7f8fa; }
+      #app { position: relative; width: 100%; min-height: 100dvh; }
+      .app-scroll { width: 100%; overflow-x: hidden; position: relative; }
+      .bottom-bar { position: fixed; }
+    }
+
+    /* ── 페이지 전환 ── */
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to   { transform: translateX(0); }
+    }
+    .app-scroll {
+      animation: slideInRight 0.28s cubic-bezier(0.4,0,0.2,1) forwards;
+      padding-top: 78px;
+    }
+
+    /* ── 고정 헤더 (뒤로가기만) ── */
+    #page-header {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      z-index: 30;
+      background: #f7f8fa;
+    }
+    @media (max-width: 767px) {
+      #page-header { position: fixed; }
+    }
+
+    /* ── 섹션 공통 ── */
+    .section-block {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px 20px;
+    }
+    .section-label {
+      font-size: 16px;
+      font-weight: 500;
+      color: #101010;
+      letter-spacing: -0.8px;
+      line-height: 1.4;
+    }
+
+    /* ── 주문 확인 내 정보 블록 ── */
+    .info-block {
+      background: #f6f6f6;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .info-block-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(16,16,16,0.6);
+      letter-spacing: -0.24px;
+      line-height: 1.3;
+    }
+    .info-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .info-item-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #101010;
+      letter-spacing: -0.56px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+    .info-item-price {
+      font-size: 12px;
+      font-weight: 500;
+      color: #101010;
+      letter-spacing: -0.24px;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    /* ── 혜택 로고 원형 ── */
+    .benefit-logo {
+      position: relative;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      overflow: visible;
+      flex-shrink: 0;
+    }
+    .benefit-logo-inner {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .benefit-logo-badge {
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ── 하단 버튼 영역 ── */
+    .bottom-bar {
+      bottom: 0; left: 0; right: 0;
+      z-index: 40;
+      padding-top: 16px;
+      padding-bottom: 32px;
+      background: linear-gradient(to top, #f7f8fa 65%, rgba(247,248,250,0));
+    }
+    .cta-btn {
+      flex: 1;
+      border-radius: 20px;
+      padding: 16px 0;
+      font-family: 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.64px;
+      line-height: 1.3;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    /* ── 장바구니 담기 토스트 ── */
+    #cart-toast {
+      position: absolute;
+      top: 76px; left: 20px; right: 20px;
+      background: rgba(28,28,30,0.95);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      z-index: 50;
+      opacity: 0;
+      transform: translateY(-14px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: none;
+    }
+    #cart-toast.visible {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    @media (max-width: 767px) { #cart-toast { position: fixed; } }
+  </style>
+</head>
+<body>
+<div id="app" style="background: #f7f8fa;">
+
+  <!-- ── 고정 헤더 (뒤로가기) ── -->
+  <div id="page-header">
+    <div style="display: flex; align-items: center; padding: 11px 19px;">
+      <button onclick="goBack()" style="width: 46px; height: 46px; background: rgba(255,255,255,0.4);
+              border-radius: 999px; box-shadow: 0 0 19px rgba(0,0,0,0.05);
+              border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <path d="M14 18L7 11L14 4" stroke="#101010" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="app-scroll">
+    <div style="display: flex; flex-direction: column;">
+
+      <!-- ── 제목 ── -->
+      <div style="padding: 10px 20px 0;">
+        <p style="font-size: 18px; font-weight: 500; letter-spacing: -1.26px; line-height: 1.4;
+                  background: linear-gradient(to right, #2f2f2f 40%, #959595 100%);
+                  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+          모든 선택이 완료되었어요.<br>선택한 정보가 맞는지 마지막으로 확인해주세요.
+        </p>
+      </div>
+
+      <!-- ── 가입자 정보 ── -->
+      <div class="section-block">
+        <p class="section-label">가입자 정보</p>
+        <div style="background: white; border-radius: 16px; padding: 20px 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <p style="font-size: 14px; font-weight: 400; color: #101010; letter-spacing: -0.7px; line-height: 1.4;">김지훈</p>
+            <p style="font-size: 14px; font-weight: 400; color: #101010; letter-spacing: -0.7px; line-height: 1.4;">010-****-5678</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 주문 확인 ── -->
+      <div class="section-block">
+        <p class="section-label">주문 확인</p>
+        <div style="background: white; border-radius: 20px; padding: 21px 11px 23px;">
+          <div style="display: flex; flex-direction: column; gap: 20px; align-items: center;">
+
+            <!-- 제품 이미지 + 이름 -->
+            <div style="display: flex; flex-direction: column; gap: 11px; align-items: center;">
+              <img src="./assets_icon/iphonair20check.png" alt="갤럭시 S29"
+                   style="width: 123px; object-fit: contain; display: block;">
+              <div style="display: flex; flex-direction: column; gap: 4px; align-items: center;">
+                <p style="font-size: 14px; font-weight: 600; color: #101010; letter-spacing: -0.56px; line-height: 1.2;">iPhone 20 Air</p>
+                <div style="display: flex; align-items: center; gap: 4px; opacity: 0.4;">
+                  <p style="font-size: 12px; font-weight: 400; color: #101010; letter-spacing: -0.48px; line-height: 1.2; white-space: nowrap;">블랙</p>
+                  <div style="width: 1px; height: 8px; background: #d9d9d9;"></div>
+                  <p style="font-size: 12px; font-weight: 400; color: #101010; letter-spacing: -0.48px; line-height: 1.2; white-space: nowrap;">256GB</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 정보 블록들 -->
+            <div style="display: flex; flex-direction: column; gap: 8px; width: 100%;">
+
+              <!-- 요금제 -->
+              <div class="info-block">
+                <p class="info-block-label">요금제</p>
+                <div class="info-item" style="align-items: center; gap: 12px;">
+                  <!-- 요금제 아이콘 -->
+                  <img src="./assets_icon/step105gx.png" alt="5GX 프라임"
+                       style="width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; flex: 1; min-width: 0;">
+                    <p class="info-item-name">5GX 프라임</p>
+                    <p class="info-item-price">89,000원/월</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 혜택 -->
+              <div class="info-block" style="gap: 10px;">
+                <p class="info-block-label">혜택</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+
+                  <!-- 배스킨라빈스 -->
+                  <div class="info-item" style="gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
+                      <div class="benefit-logo">
+                        <div class="benefit-logo-inner">
+                          <img src="https://www.figma.com/api/mcp/asset/aecf4f94-7b77-4ef0-ad32-637289b3b67c" alt="배스킨라빈스"
+                               style="width: 24px; height: 24px; object-fit: contain;">
+                        </div>
+                        <img class="benefit-logo-badge"
+                             src="https://www.figma.com/api/mcp/asset/78e8e48c-0518-4e28-8936-eb3887d513ea" alt="">
+                      </div>
+                      <p class="info-item-name">월 1회 싱글레귤러 50% 할인</p>
+                    </div>
+                    <p class="info-item-price">+0원</p>
+                  </div>
+
+                  <!-- ChatGPT -->
+                  <div class="info-item" style="gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
+                      <div class="benefit-logo">
+                        <div class="benefit-logo-inner" style="overflow: hidden;">
+                          <img src="https://www.figma.com/api/mcp/asset/149b5831-83d3-46ba-b7d1-5195de768654" alt="ChatGPT"
+                               style="width: 36px; height: 36px; object-fit: cover; border-radius: 50%;">
+                        </div>
+                        <img class="benefit-logo-badge"
+                             src="https://www.figma.com/api/mcp/asset/78e8e48c-0518-4e28-8936-eb3887d513ea" alt="">
+                      </div>
+                      <p class="info-item-name">ChatGPT Plus 이용권 구독</p>
+                    </div>
+                    <p class="info-item-price">+0원</p>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- 부가서비스 -->
+              <div class="info-block" style="gap: 10px;">
+                <p class="info-block-label">부가서비스</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                  <div class="info-item">
+                    <p class="info-item-name">분실파손6 고급(온라인)</p>
+                    <p class="info-item-price">5,400원</p>
+                  </div>
+                  <div class="info-item">
+                    <p class="info-item-name">해외주식노트</p>
+                    <p class="info-item-price">5,500원</p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── T 기프트 ── -->
+      <div class="section-block">
+        <p class="section-label">T 기프트</p>
+        <div style="background: white; border-radius: 16px; padding: 20px 14px;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="position: relative; width: 60px; height: 60px; flex-shrink: 0; border-radius: 8px; overflow: hidden;">
+              <img src="./assets_icon/step10gfit.png" alt="갤럭시 링 3"
+                   style="width: 100%; height: 100%; object-fit: cover; display: block;">
+              <div style="position: absolute; inset: 0; background: rgba(169,169,169,0.2);"></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 2px;">
+              <p style="font-size: 12px; font-weight: 400; color: #101010; letter-spacing: -0.6px; line-height: 1.4;">삼성전자</p>
+              <p style="font-size: 14px; font-weight: 600; color: #101010; letter-spacing: -0.7px; line-height: 1.4;">갤럭시 링 3</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 스크롤 여백 -->
+      <div style="height: 150px;"></div>
+
+    </div>
+  </div><!-- /.app-scroll -->
+
+  <!-- ── 하단 버튼 영역 ── -->
+  <div class="bottom-bar">
+    <!-- 예상 월 납부 금액 -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 24px 14px;">
+      <p style="font-size: 14px; font-weight: 500; color: #101010; letter-spacing: -0.56px; line-height: 1.5;">예상 월 납부 금액</p>
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <p style="font-size: 15px; font-weight: 600; color: #000; letter-spacing: -1px; line-height: 26px;">월 118,700원</p>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M4.5 6.5L8 10L11.5 6.5" stroke="#1c1c1e" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <!-- 장바구니 담기 / 결제하기 -->
+    <div style="display: flex; gap: 8px; padding: 0 20px;">
+      <button class="cta-btn" onclick="goCart()" style="border: 1px solid #111; background: white; color: #222; cursor: pointer;">장바구니 담기</button>
+      <button class="cta-btn" style="border: none; background: #1c1c1e; color: white; cursor: pointer;">결제하기</button>
+    </div>
+  </div>
+
+  <!-- ── 장바구니 담기 토스트 ── -->
+  <div id="cart-toast">
+    <p style="flex:1; font-size:14px; font-weight:600; color:white; letter-spacing:-0.4px; line-height:1.3;">성공적으로 담았어요.</p>
+    <button onclick="window.location.href='./scenario3-11.html'"
+            style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.75); letter-spacing:-0.3px; line-height:1.3;
+                   background:none; border:none; cursor:pointer; font-family:inherit; white-space:nowrap; padding:0;">
+      장바구니 바로가기
+    </button>
+  </div>
+
+</div><!-- /#app -->
+
+<script>
+  function goBack() {
+    window.location.href = './scenario3-9.html';
+  }
+  function goCart() {
+    var toast = document.getElementById('cart-toast');
+    if (!toast) { window.location.href = './scenario3-11.html'; return; }
+    toast.classList.add('visible');
+  }
+
+  // 데스크탑에서 bottom-bar를 #app 기준으로 이동
+  (function() {
+    var app = document.getElementById('app');
+    if (app && window.innerWidth >= 768) {
+      var bar = document.querySelector('.bottom-bar');
+      if (bar) app.appendChild(bar);
+    }
+  })();
+</script>
+</body>
+</html>
