@@ -44,7 +44,7 @@
       body { background: #f7f8fa; }
       #app { position: relative; width: 100%; min-height: 100dvh; }
       .app-scroll { width: 100%; overflow-x: hidden; position: relative; }
-      .bottom-bar { position: fixed; }
+      .bottom-bar { position: fixed; will-change: transform; transform: translateZ(0); }
     }
 
     /* ── 페이지 전환 ── */
