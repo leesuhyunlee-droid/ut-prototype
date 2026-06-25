@@ -538,6 +538,14 @@
       app.appendChild(bar);
     }
   })();
+
+  // slideInRight 애니메이션 종료 후 transform 레이어 해제 (안드로이드 fixed 버튼 노출 문제 수정)
+  var scrollEl = document.querySelector('.app-scroll');
+  if (scrollEl) {
+    scrollEl.addEventListener('animationend', function() {
+      scrollEl.style.animation = 'none';
+    }, { once: true });
+  }
 </script>
 </body>
 </html>
